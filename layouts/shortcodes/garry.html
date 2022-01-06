@@ -1,0 +1,12 @@
+<div class='speechbubble'>
+    <div class="garry">
+        <img src="/images/garry-64.webp" alt="garry" />
+    </div>
+    <div class="chat{{ with .Get 1 }} {{.}}{{end}}">
+        <p>
+            <span {{ if eq (.Get 1) "warn" }}class="hisses" {{else if eq (.Get 1) "err" }}class="urges" {{ else
+                }}class="whisper" {{ end }}></span>
+            {{.Get 0}}
+        </p>
+    </div>
+</div>
