@@ -1,0 +1,81 @@
+baseURL = 'https://ripx80.github.io/site'
+languageCode = 'en-us'
+title = 'ripx80 onexec'
+theme = "cactus"
+copyright = "ripx80 - Daniel Rittweiler"
+
+[author]
+  name = 'ripx80'
+
+[params]
+  colortheme = "white" # dark, light, white, or classic
+  description = "ripx80 technical thoughts and try to memorize yesterday"
+#   mainSection = "posts"
+#   mainSectionTitle = "Blog"
+  tagsOverview = false
+  tocInline = true
+  showAllPostsOnHomePage = true
+  postsOnHomePage = 5
+  showProjectsList = true
+  projectsUrl = "https://github.com/ripx80/site"
+  rss = true
+  mathjax = false
+  showAllPostsArchive = true
+  logo =  "images/garry-64.webp"
+  css = ["css/custom.css"]
+
+
+    # Post page settings
+  show_updated = true # default
+  showReadTime = true # default
+
+# cookies
+[params.cookies]
+enable = true
+expire_days = 1
+
+[[menu.main]]
+name = "home"
+url = "/"
+weight = 1
+
+[[menu.main]]
+name = "writings"
+url = "/posts"
+weight = 2
+
+[[menu.main]]
+name = "tags"
+url = "/tags"
+weight = 3
+
+[[menu.main]]
+name = "whoami"
+url = "/whoami/"
+weight = 4
+
+
+[[params.social]]
+  name = "github"
+  link = "https://github.com/ripx80"
+
+[[params.social]]
+  name = "email"
+  link = "ripx80@protonmail.com"
+
+# patreon, twitter, mastodon
+
+# can enable comments
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = false
+    hl_Lines = ""
+    lineNoStart = 1
+    lineNos = true
+    lineNumbersInTable = true
+    noClasses = true
+    style = "monokai" # monokai, fruity, dracula
+    tabWidth = 4
+

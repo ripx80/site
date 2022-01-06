@@ -1,0 +1,19 @@
+{
+    "list": [
+        {
+            "name": "brewman",
+            "url": "https://ripx80/brewman/",
+            "desc": "brewman cyberbrew"
+        },
+        {
+            "name": "skipper",
+            "url": "https://github.com/zalando/skipper",
+            "desc": "(contributor) skipper http router"
+        },
+        {
+            "name": "gopacket",
+            "url": "https://github.com/google/gopacket",
+            "desc": "(contributor) golang lib to manipulate net packages"
+        }
+    ]
+}
