@@ -9,15 +9,16 @@
                 {{ range .Site.Menus.main }}
                 <li><a href="{{ .URL }}">{{ .Name }}</a></li>
                 {{ end }}
-                <li><a href="/legal">legal notice</a></li>
-                <li><a href="/privacy">pricacy policy</a></li>
+                <li><a href='{{ "legal" | absURL }}'>legal notice</a></li>
+                <li><a href='{{ "privacy" | absURL }}'>pricacy policy</a></li>
             </ul>
         </nav>
     </div>
 </footer>
 
 <div id="cookies">
-    if you use this site you accept the usage of cookies. take a closer look under <a href="/privacy">privacy policy</a>
+    if you use this site you accept the usage of cookies. take a closer look under <a
+        href='{{ "privacy" | absURL }}'>privacy policy</a>
     <button id="cookies-btn">accept</button>
 </div>
 <script src={{ "js/custom.js" | absURL }} defer></script>
