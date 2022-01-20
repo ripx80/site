@@ -7,11 +7,15 @@
 }
 .speechbubble .garry{
     margin-right:15px;
+    width: 164px fixed;
 }
+
+
 .speechbubble .chat {
     padding-left: 15px;
     border-left: 5px solid;
     border-color: #01ad9b;
+    width:100%;
 }
 .speechbubble .warn {
     border-color: #ffe100;
