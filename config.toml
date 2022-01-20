@@ -1,4 +1,4 @@
-baseURL = 'https://ripx80.github.io/site'
+baseURL = 'https://ripx80.de'
 languageCode = 'en-us'
 title = 'ripx80 onexec'
 theme = "cactus"
