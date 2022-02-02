@@ -2,7 +2,7 @@ baseURL = 'https://ripx80.de'
 languageCode = 'en-us'
 title = 'ripx80 onexec'
 theme = "cactus"
-copyright = "ripx80 - Daniel Rittweiler"
+copyright = "ripx80 - daniel rittweiler"
 
 [author]
   name = 'ripx80'
@@ -45,14 +45,19 @@ url = "/posts"
 weight = 2
 
 [[menu.main]]
-name = "tags"
-url = "/tags"
+name = "lib"
+url = "/lib"
 weight = 3
 
 [[menu.main]]
-name = "whoami"
-url = "/whoami/"
+name = "tags"
+url = "/tags"
 weight = 4
+
+[[menu.main]]
+name = "whoami"
+url = "/whoami"
+weight = 5
 
 
 [[params.social]]
