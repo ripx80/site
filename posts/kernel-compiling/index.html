@@ -1,474 +1,130 @@
-<!doctype html><html lang=en-us>
-<head>
-<link rel=preload href=/lib/font-awesome/webfonts/fa-brands-400.woff2 as=font type=font/woff2 crossorigin=anonymous>
-<link rel=preload href=/lib/font-awesome/webfonts/fa-regular-400.woff2 as=font type=font/woff2 crossorigin=anonymous>
-<link rel=preload href=/lib/font-awesome/webfonts/fa-solid-900.woff2 as=font type=font/woff2 crossorigin=anonymous>
-<link rel=preload href=/lib/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2 as=font type=font/woff2 crossorigin=anonymous>
-<script type=text/javascript src=https://latest.cactus.chat/cactus.js></script>
-<link rel=stylesheet href=https://latest.cactus.chat/style.css type=text/css>
-<meta charset=utf-8>
-<meta http-equiv=x-ua-compatible content="IE=edge">
-<title> Kernel Compiling | ripx80 onexec</title>
-<link rel=canonical href=https://ripx80.de/posts/kernel-compiling/>
-<meta name=description content="ripx80 technical thoughts and try to memorize yesterday">
-<meta name=viewport content="width=device-width,initial-scale=1">
-<meta name=robots content="all,follow">
-<meta name=googlebot content="index,follow,snippet,archive">
-<meta property="og:title" content="Kernel Compiling">
-<meta property="og:description" content="Step by Step kernel configuration and compiling for your system">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://ripx80.de/posts/kernel-compiling/"><meta property="article:section" content="posts">
-<meta property="article:published_time" content="2021-12-28T16:46:50+01:00">
-<meta property="article:modified_time" content="2021-12-28T16:46:50+01:00">
-<meta name=twitter:card content="summary">
-<meta name=twitter:title content="Kernel Compiling">
-<meta name=twitter:description content="Step by Step kernel configuration and compiling for your system">
-<link rel=stylesheet href=https://ripx80.de/css/styles.94f653e9e151e28067a7c5dbbc4600cbd5a3c721e79faaf971e523c40f3b249b8e4f20bb57810dfffa8d559ca5c140fd56eb4cd9c0853113ad08e66afdb08bdd.css integrity="sha512-lPZT6eFR4oBnp8XbvEYAy9WjxyHnn6r5ceUjxA87JJuOTyC7V4EN//qNVZylwUD9VutM2cCFMROtCOZq/bCL3Q==">
-<link rel=stylesheet href=https://ripx80.de/css/custom.css><!--[if lt IE 9]><script src=https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js></script>
-<script src=https://oss.maxcdn.com/respond/1.4.2/respond.min.js></script><![endif]-->
-<link rel=icon type=image/png href=https://ripx80.de/images/favicon.ico>
-</head>
-<body class="max-width mx-auto px3 ltr">
-<div class="content index py4">
-<div id=header-post>
-<a id=menu-icon href=#><i class="fas fa-bars fa-lg"></i></a>
+<!doctype html><html lang=en-us><head><link rel=preload href=/lib/font-awesome/webfonts/fa-brands-400.woff2 as=font type=font/woff2 crossorigin=anonymous><link rel=preload href=/lib/font-awesome/webfonts/fa-regular-400.woff2 as=font type=font/woff2 crossorigin=anonymous><link rel=preload href=/lib/font-awesome/webfonts/fa-solid-900.woff2 as=font type=font/woff2 crossorigin=anonymous><link rel=preload href=/lib/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2 as=font type=font/woff2 crossorigin=anonymous><script type=text/javascript src=https://latest.cactus.chat/cactus.js></script>
+<link rel=stylesheet href=https://latest.cactus.chat/style.css type=text/css><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge"><title>Kernel Compiling | ripx80 onexec</title><link rel=canonical href=https://ripx80.de/posts/kernel-compiling/><meta name=description content="ripx80 technical thoughts and try to memorize yesterday"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="all,follow"><meta name=googlebot content="index,follow,snippet,archive"><meta property="og:title" content="Kernel Compiling"><meta property="og:description" content="Step by Step kernel configuration and compiling for your system"><meta property="og:type" content="article"><meta property="og:url" content="https://ripx80.de/posts/kernel-compiling/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-12-28T16:46:50+01:00"><meta property="article:modified_time" content="2021-12-28T16:46:50+01:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="Kernel Compiling"><meta name=twitter:description content="Step by Step kernel configuration and compiling for your system"><link rel=stylesheet href=https://ripx80.de/css/styles.94f653e9e151e28067a7c5dbbc4600cbd5a3c721e79faaf971e523c40f3b249b8e4f20bb57810dfffa8d559ca5c140fd56eb4cd9c0853113ad08e66afdb08bdd.css integrity="sha512-lPZT6eFR4oBnp8XbvEYAy9WjxyHnn6r5ceUjxA87JJuOTyC7V4EN//qNVZylwUD9VutM2cCFMROtCOZq/bCL3Q=="><link rel=stylesheet href=https://ripx80.de/css/custom.css><!--[if lt IE 9]><script src=https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js></script>
+<script src=https://oss.maxcdn.com/respond/1.4.2/respond.min.js></script><![endif]--><link rel=icon type=image/png href=https://ripx80.de/images/favicon.ico></head><body class="max-width mx-auto px3 ltr"><div class="content index py4"><div id=header-post><a id=menu-icon href=#><i class="fas fa-bars fa-lg"></i></a>
 <a id=menu-icon-tablet href=#><i class="fas fa-bars fa-lg"></i></a>
-<a id=top-icon-tablet href=# onclick="$('html, body').animate({scrollTop:0},'fast')" style=display:none aria-label="Top of Page"><i class="fas fa-chevron-up fa-lg"></i></a>
-<span id=menu>
-<span id=nav>
-<ul>
-<li><a href=/>home</a></li>
-<li><a href=/posts>writings</a></li>
-<li><a href=/lib>lib</a></li>
-<li><a href=/tags>tags</a></li>
-<li><a href=/whoami>whoami</a></li>
-</ul>
-</span>
-<br>
-<span id=actions>
-<ul>
-<li>
-<a class=icon href=https://ripx80.de/lib/ aria-label=Previous>
-<i class="fas fa-chevron-left" aria-hidden=true onmouseover="$('#i-prev').toggle()" onmouseout="$('#i-prev').toggle()"></i>
-</a>
-</li>
-<li>
-<a class=icon href=https://ripx80.de/posts/ufleku-recipe/ aria-label=Next>
-<i class="fas fa-chevron-right" aria-hidden=true onmouseover="$('#i-next').toggle()" onmouseout="$('#i-next').toggle()"></i>
-</a>
-</li>
-<li>
-<a class=icon href=# onclick="$('html, body').animate({scrollTop:0},'fast')" aria-label="Top of Page">
-<i class="fas fa-chevron-up" aria-hidden=true onmouseover="$('#i-top').toggle()" onmouseout="$('#i-top').toggle()"></i>
-</a>
-</li>
-<li>
-<a class=icon href=# aria-label=Share>
-<i class="fas fa-share-alt" aria-hidden=true onmouseover="$('#i-share').toggle()" onmouseout="$('#i-share').toggle()" onclick="return $('#share').toggle(),!1"></i>
-</a>
-</li>
-</ul>
-<span id=i-prev class=info style=display:none>Previous post</span>
+<a id=top-icon-tablet href=# onclick='$("html, body").animate({scrollTop:0},"fast")' style=display:none aria-label="Top of Page"><i class="fas fa-chevron-up fa-lg"></i></a>
+<span id=menu><span id=nav><ul><li><a href=/>home</a></li><li><a href=/posts>writings</a></li><li><a href=/lib>lib</a></li><li><a href=/tags>tags</a></li><li><a href=/whoami>whoami</a></li></ul></span><br><span id=actions><ul><li><a class=icon href=https://ripx80.de/lib/ aria-label=Previous><i class="fas fa-chevron-left" aria-hidden=true onmouseover='$("#i-prev").toggle()' onmouseout='$("#i-prev").toggle()'></i></a></li><li><a class=icon href=https://ripx80.de/posts/ufleku-recipe/ aria-label=Next><i class="fas fa-chevron-right" aria-hidden=true onmouseover='$("#i-next").toggle()' onmouseout='$("#i-next").toggle()'></i></a></li><li><a class=icon href=# onclick='$("html, body").animate({scrollTop:0},"fast")' aria-label="Top of Page"><i class="fas fa-chevron-up" aria-hidden=true onmouseover='$("#i-top").toggle()' onmouseout='$("#i-top").toggle()'></i></a></li><li><a class=icon href=# aria-label=Share><i class="fas fa-share-alt" aria-hidden=true onmouseover='$("#i-share").toggle()' onmouseout='$("#i-share").toggle()' onclick='return $("#share").toggle(),!1'></i></a></li></ul><span id=i-prev class=info style=display:none>Previous post</span>
 <span id=i-next class=info style=display:none>Next post</span>
 <span id=i-top class=info style=display:none>Back to top</span>
-<span id=i-share class=info style=display:none>Share post</span>
-</span>
-<br>
-<div id=share style=display:none>
-<ul>
-<li>
-<a class=icon href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f" aria-label=Facebook>
-<i class="fab fa-facebook" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="https://twitter.com/share?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&text=Kernel%20Compiling" aria-label=Twitter>
-<i class="fab fa-twitter" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=Linkedin>
-<i class="fab fa-linkedin" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&is_video=false&description=Kernel%20Compiling" aria-label=Pinterest>
-<i class="fab fa-pinterest" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="mailto:?subject=Kernel%20Compiling&body=Check out this article: https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f" aria-label=Email>
-<i class="fas fa-envelope" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="https://getpocket.com/save?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=Pocket>
-<i class="fab fa-get-pocket" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="http://reddit.com/submit?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=reddit>
-<i class="fab fa-reddit" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="http://www.tumblr.com/share/link?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&name=Kernel%20Compiling&description=Step%20by%20Step%20kernel%20configuration%20and%20compiling%20for%20your%20system" aria-label=Tumblr>
-<i class="fab fa-tumblr" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&t=Kernel%20Compiling" aria-label="Hacker News">
-<i class="fab fa-hacker-news" aria-hidden=true></i>
-</a>
-</li>
-</ul>
-</div>
-</span>
-</div>
-<article class=post itemscope itemtype=http://schema.org/BlogPosting>
-<header>
-<h1 class=posttitle itemprop="name headline">
-Kernel Compiling
-</h1>
-<div class=meta>
-<div class=postdate>
-<time datetime="2021-12-28 16:46:50 +0100 +0100" itemprop=datePublished>2021-12-28</time>
-</div>
-<div class=article-read-time>
-<i class="far fa-clock"></i>
-3 minute read
-</div>
-<div class=article-tag>
-<i class="fas fa-tag"></i>
+<span id=i-share class=info style=display:none>Share post</span></span><br><div id=share style=display:none><ul><li><a class=icon href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f" aria-label=Facebook><i class="fab fa-facebook" aria-hidden=true></i></a></li><li><a class=icon href="https://twitter.com/share?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&text=Kernel%20Compiling" aria-label=Twitter><i class="fab fa-twitter" aria-hidden=true></i></a></li><li><a class=icon href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=Linkedin><i class="fab fa-linkedin" aria-hidden=true></i></a></li><li><a class=icon href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&is_video=false&description=Kernel%20Compiling" aria-label=Pinterest><i class="fab fa-pinterest" aria-hidden=true></i></a></li><li><a class=icon href="mailto:?subject=Kernel%20Compiling&body=Check out this article: https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f" aria-label=Email><i class="fas fa-envelope" aria-hidden=true></i></a></li><li><a class=icon href="https://getpocket.com/save?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=Pocket><i class="fab fa-get-pocket" aria-hidden=true></i></a></li><li><a class=icon href="http://reddit.com/submit?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=reddit><i class="fab fa-reddit" aria-hidden=true></i></a></li><li><a class=icon href="http://www.tumblr.com/share/link?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&name=Kernel%20Compiling&description=Step%20by%20Step%20kernel%20configuration%20and%20compiling%20for%20your%20system" aria-label=Tumblr><i class="fab fa-tumblr" aria-hidden=true></i></a></li><li><a class=icon href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&t=Kernel%20Compiling" aria-label="Hacker News"><i class="fab fa-hacker-news" aria-hidden=true></i></a></li></ul></div></span></div><article class=post itemscope itemtype=http://schema.org/BlogPosting><header><h1 class=posttitle itemprop="name headline">Kernel Compiling</h1><div class=meta><div class=postdate><time datetime="2021-12-28 16:46:50 +0100 +0100" itemprop=datePublished>2021-12-28</time></div><div class=article-read-time><i class="far fa-clock"></i>
+3 minute read</div><div class=article-tag><i class="fas fa-tag"></i>
 <a class=tag-link href=/tags/arch rel=tag>arch</a>
 ,
 <a class=tag-link href=/tags/optimization rel=tag>optimization</a>
 ,
-<a class=tag-link href=/tags/security rel=tag>security</a>
-</div>
-</div>
-</header>
-<div id=toc>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#introduction>Introduction</a></li>
-<li><a href=#install-kernel-sources-and-headers>Install kernel sources and headers</a></li>
-<li><a href=#kernel-configuration-and-compiling>Kernel configuration and compiling</a></li>
-<li><a href=#setting-up-your-boot-environment>Setting up your boot environment</a></li>
-<li><a href=#optimize-your-kernel-settings>Optimize your kernel settings</a></li>
-</ul>
-</nav>
-</div>
-<div class=content itemprop=articleBody>
-<h2 id=introduction>Introduction</h2>
-<p>This is a short discurse about self kernel compilation on a arch system. Gentoo users are familiar with this kind of instructions or use the genkernel programm.
-You can find an article on <a href=https://wiki.archlinux.org/index.php/Kernels/Traditional_compilation>archlinux</a></p>
-<h2 id=install-kernel-sources-and-headers>Install kernel sources and headers</h2>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>pacman -S base-devel <span style=color:#75715e># only gcc and make</span>
-mkdir /usr/src/linux
-cd /usr/src/linux
-</code></pre></td></tr></table>
-</div>
-</div><p>download the newest kernel release, at this moment it is 4.13.0</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.13.2.tar.xz
-wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.13.2.tar.sign
-wget https://www.kernel.org/pub/linux/kernel/v4.x/sha256sums.asc
-</code></pre></td></tr></table>
-</div>
-</div><p>check the sha256 checksum and decompress the archive and check the sign. you can see the offical key from Greg Kroah-Hartman on the linux website.</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>grep <span style=color:#e6db74>&#39;linux-4.13.2.tar.xz&#39;</span> sha256sums.asc
-064adc177a384a7aee6b18ef5d47c1cea3a43fae1aaa6aa95fdc97eb137ffcd1  linux-4.13.2.tar.xz
-
-sha256sum linux-4.13.2.tar.xz
-064adc177a384a7aee6b18ef5d47c1cea3a43fae1aaa6aa95fdc97eb137ffcd1  linux-4.13.2.tar.xz
-
-unxz linux-4.13.2.tar.xz
-gpg2 --verify linux-4.13.2.tar.sign
-gpg2 --keyserver hkp://keys.gnupg.net --recv-keys <span style=color:#ae81ff>\
-</span><span style=color:#ae81ff></span>647F28654894E3BD457199BE38DBBDC86092693E
-</code></pre></td></tr></table>
-</div>
-</div><p>when everything looks good continue with this steps</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>tar -xpf linux-4.13.2.tar
-ln -s linux-4.13.2 linux;cd linux
-</code></pre></td></tr></table>
-</div>
-</div><h2 id=kernel-configuration-and-compiling>Kernel configuration and compiling</h2>
-<p>Now we are in the kernel source tree. clean up the tree is a good thing to begin :-)
-if you have a kernel .config copy it to a save place.</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>make clean <span style=color:#f92672>&amp;&amp;</span> make mrproper
-</code></pre></td></tr></table>
-</div>
-</div><p>Now the work begin to configure your specific kernel config. this will be saved in .config file in your kernel base dir. A good begin is to use your previously hand made config or use the current running:</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>make localmodconfig
-<span style=color:#75715e># or the running arch config</span>
-zcat /proc/config.gz &gt; .config
-</code></pre></td></tr></table>
-</div>
-</div><p>you will be asked about the new features. if you unsure use the default.
+<a class=tag-link href=/tags/security rel=tag>security</a></div></div></header><div id=toc><nav id=TableOfContents><ul><li><a href=#introduction>Introduction</a></li><li><a href=#install-kernel-sources-and-headers>Install kernel sources and headers</a></li><li><a href=#kernel-configuration-and-compiling>Kernel configuration and compiling</a></li><li><a href=#setting-up-your-boot-environment>Setting up your boot environment</a></li><li><a href=#optimize-your-kernel-settings>Optimize your kernel settings</a></li></ul></nav></div><div class=content itemprop=articleBody><h2 id=introduction>Introduction</h2><p>This is a short discurse about self kernel compilation on a arch system. Gentoo users are familiar with this kind of instructions or use the genkernel programm.
+You can find an article on <a href=https://wiki.archlinux.org/index.php/Kernels/Traditional_compilation>archlinux</a></p><h2 id=install-kernel-sources-and-headers>Install kernel sources and headers</h2><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>pacman -S base-devel <span style=color:#75715e># only gcc and make</span>
+</span></span><span style=display:flex><span>mkdir /usr/src/linux
+</span></span><span style=display:flex><span>cd /usr/src/linux
+</span></span></code></pre></td></tr></table></div></div><p>download the newest kernel release, at this moment it is 4.13.0</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.13.2.tar.xz
+</span></span><span style=display:flex><span>wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.13.2.tar.sign
+</span></span><span style=display:flex><span>wget https://www.kernel.org/pub/linux/kernel/v4.x/sha256sums.asc
+</span></span></code></pre></td></tr></table></div></div><p>check the sha256 checksum and decompress the archive and check the sign. you can see the offical key from Greg Kroah-Hartman on the linux website.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>grep <span style=color:#e6db74>&#39;linux-4.13.2.tar.xz&#39;</span> sha256sums.asc
+</span></span><span style=display:flex><span>064adc177a384a7aee6b18ef5d47c1cea3a43fae1aaa6aa95fdc97eb137ffcd1  linux-4.13.2.tar.xz
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sha256sum linux-4.13.2.tar.xz
+</span></span><span style=display:flex><span>064adc177a384a7aee6b18ef5d47c1cea3a43fae1aaa6aa95fdc97eb137ffcd1  linux-4.13.2.tar.xz
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>unxz linux-4.13.2.tar.xz
+</span></span><span style=display:flex><span>gpg2 --verify linux-4.13.2.tar.sign
+</span></span><span style=display:flex><span>gpg2 --keyserver hkp://keys.gnupg.net --recv-keys <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>647F28654894E3BD457199BE38DBBDC86092693E
+</span></span></code></pre></td></tr></table></div></div><p>when everything looks good continue with this steps</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>tar -xpf linux-4.13.2.tar
+</span></span><span style=display:flex><span>ln -s linux-4.13.2 linux;cd linux
+</span></span></code></pre></td></tr></table></div></div><h2 id=kernel-configuration-and-compiling>Kernel configuration and compiling</h2><p>Now we are in the kernel source tree. clean up the tree is a good thing to begin :-)
+if you have a kernel .config copy it to a save place.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>make clean <span style=color:#f92672>&amp;&amp;</span> make mrproper
+</span></span></code></pre></td></tr></table></div></div><p>Now the work begin to configure your specific kernel config. this will be saved in .config file in your kernel base dir. A good begin is to use your previously hand made config or use the current running:</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>make localmodconfig
+</span></span><span style=display:flex><span><span style=color:#75715e># or the running arch config</span>
+</span></span><span style=display:flex><span>zcat /proc/config.gz &gt; .config
+</span></span></code></pre></td></tr></table></div></div><p>you will be asked about the new features. if you unsure use the default.
 after this a .config will be created in your kernel base dir. Now its time for you!
-use the old way with</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>cp .config ../config-default
-make menuconfig
-</code></pre></td></tr></table>
-</div>
-</div><p>or the new interface</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh> make nconfig
-</code></pre></td></tr></table>
-</div>
-</div><p>After edit your configuration (super-slim config of my computer will to be download at the end of this article) buid your kernel. But before we install the modules we change the version of our Kernel in the Makefile. We will increase this number if we build a new kernel. So we have no conflicts with the modules&mldr; (-j NUMBER, is for the number of cores in your computer)</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#75715e>#nano -w Makefile</span>
-EXTRAVERSION <span style=color:#f92672>=</span> -acr-1
-
-make -j3; make modules_install
-</code></pre></td></tr></table>
-</div>
-</div><h2 id=setting-up-your-boot-environment>Setting up your boot environment</h2>
-<p>When your compile process was successful you will be copy your kernel to your /boot folder (64-bit system). While I have a full encrypted system I need a ramdisk to open my partitions before I boot the initial system. So lets copy and make a ramdisk with the correct modules.</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>cp arch/x86_64/boot/bzImage /boot/kernel-4.13.2-acr-1
-mkinitcpio -k 4.13.2-acr-1-ARCH -g /boot/initramfs-linux-4.13.img
-</code></pre></td></tr></table>
-</div>
-</div><p>And change your boot menu. I used the syslinux boot-manager. So my menu config looks like this.</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">8
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">9
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#75715e>#nano -w /boot/syslinux/syslinux.cfg#</span>
-
-LABEL arch-4.13.2-atr-1
-    LINUX ../kernel-4.13.2-atr-1
-    APPEND root<span style=color:#f92672>=</span>/dev/mapper/crypt cryptdevice<span style=color:#f92672>=</span>/dev/sda3:crypt<span style=color:#ae81ff>\
-</span><span style=color:#ae81ff></span>    rootflags<span style=color:#f92672>=</span>subvol<span style=color:#f92672>=</span>__active/root rw intel_iommu<span style=color:#f92672>=</span>on amd_iommu<span style=color:#f92672>=</span>on
-    INITRD ../initramfs-linux-4.13.img
-
-syslinux-install_update -iam
-</code></pre></td></tr></table>
-</div>
-</div><p>And now reboot. If all is correct you will be get the password prompt of the crypt device and you systems boot correctly. But when you look of the size of your kernel&mldr;</p>
-<h2 id=optimize-your-kernel-settings>Optimize your kernel settings</h2>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>du -sh kernel-4.13.2-acr-1-ARCH initramfs-linux-4.13.img
-
-5.2M    kernel-4.13.2-acr-1-ARCH
-4.8M    initramfs-linux-4.13.img
-</code></pre></td></tr></table>
-</div>
-</div><p>This is not the optimization you want to. Its time to optimize your kernel needs.</p>
-<div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4>
-<table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">5
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">6
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">7
-</span><span style="margin-right:.4em;padding:0 .4em;color:#7f7f7f">8
-</span></code></pre></td>
-<td style=vertical-align:top;padding:0;margin:0;border:0;width:100%>
-<pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>cd /usr/src/linux/linux
-make mrproper
-cp ../config-default ./.config
-
-<span style=color:#75715e>#nano -w Makefile</span>
-EXTRAVERSION <span style=color:#f92672>=</span> -acr-2
-
-make nconfig
-</code></pre></td></tr></table>
-</div>
-</div><p>Now you deselect all the options you doesn&rsquo;t need for you computer and your setup.
-Sometimes its a difficult thing but when you look in the description of a kernel feature you will get an recommendation what you should do:</p>
-<p>If you don&rsquo;t know what this means you don&rsquo;t need it.
-or</p>
-<p>This is generally a good idea, so say Y.</p>
-<p>Get you a smaller kernel size like 1MB? Its you challange&mldr;</p>
-</div>
-</article>
-<div id=footer-post-container>
-<div id=footer-post>
-<div id=nav-footer style=display:none>
-<ul>
-<li><a href=/>home</a></li>
-<li><a href=/posts>writings</a></li>
-<li><a href=/lib>lib</a></li>
-<li><a href=/tags>tags</a></li>
-<li><a href=/whoami>whoami</a></li>
-</ul>
-</div>
-<div id=share-footer style=display:none>
-<ul>
-<li>
-<a class=icon href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f" aria-label=Facebook>
-<i class="fab fa-facebook fa-lg" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="https://twitter.com/share?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&text=Kernel%20Compiling" aria-label=Twitter>
-<i class="fab fa-twitter fa-lg" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=Linkedin>
-<i class="fab fa-linkedin fa-lg" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&is_video=false&description=Kernel%20Compiling" aria-label=Pinterest>
-<i class="fab fa-pinterest fa-lg" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="mailto:?subject=Kernel%20Compiling&body=Check out this article: https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f" aria-label=Email>
-<i class="fas fa-envelope fa-lg" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="https://getpocket.com/save?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=Pocket>
-<i class="fab fa-get-pocket fa-lg" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="http://reddit.com/submit?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=reddit>
-<i class="fab fa-reddit fa-lg" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="http://www.tumblr.com/share/link?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&name=Kernel%20Compiling&description=Step%20by%20Step%20kernel%20configuration%20and%20compiling%20for%20your%20system" aria-label=Tumblr>
-<i class="fab fa-tumblr fa-lg" aria-hidden=true></i>
-</a>
-</li>
-<li>
-<a class=icon href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&t=Kernel%20Compiling" aria-label="Hacker News">
-<i class="fab fa-hacker-news fa-lg" aria-hidden=true></i>
-</a>
-</li>
-</ul>
-</div>
-<div id=actions-footer>
-<a id=menu-toggle class=icon href=# onclick="return $('#nav-footer').toggle(),!1" aria-label=Menu>
-<i class="fas fa-bars fa-lg" aria-hidden=true></i> Menu</a>
-<a id=share-toggle class=icon href=# onclick="return $('#share-footer').toggle(),!1" aria-label=Share>
-<i class="fas fa-share-alt fa-lg" aria-hidden=true></i> share</a>
-<a id=top style=display:none class=icon href=# onclick="$('html, body').animate({scrollTop:0},'fast')" aria-label="Top of Page">
-<i class="fas fa-chevron-up fa-lg" aria-hidden=true></i> Top</a>
-</div>
-</div>
-</div>
-<footer id=footer>
-<div class=footer-left>
-Copyright &copy; 2022 ripx80 - daniel rittweiler
-</div>
-<div class=footer-right>
-<nav>
-<ul>
-<li><a href=/>home</a></li>
-<li><a href=/posts>writings</a></li>
-<li><a href=/lib>lib</a></li>
-<li><a href=/tags>tags</a></li>
-<li><a href=/whoami>whoami</a></li>
-<li><a href=https://ripx80.de/legal>legal notice</a></li>
-<li><a href=https://ripx80.de/privacy>pricacy policy</a></li>
-</ul>
-</nav>
-</div>
-</footer>
-<div id=cookies>
-if you use this site you accept the usage of cookies. take a closer look under <a href=https://ripx80.de/privacy>privacy policy</a>
-<button id=cookies-btn>accept</button>
-</div>
-<script src=https://ripx80.de/js/custom.js defer></script>
-</div>
-</body>
-<link rel=stylesheet href=/lib/font-awesome/css/all.min.css>
-<script src=/lib/jquery/jquery.min.js></script>
+use the old way with</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>cp .config ../config-default
+</span></span><span style=display:flex><span>make menuconfig
+</span></span></code></pre></td></tr></table></div></div><p>or the new interface</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span> make nconfig
+</span></span></code></pre></td></tr></table></div></div><p>After edit your configuration (super-slim config of my computer will to be download at the end of this article) buid your kernel. But before we install the modules we change the version of our Kernel in the Makefile. We will increase this number if we build a new kernel. So we have no conflicts with the modules&mldr; (-j NUMBER, is for the number of cores in your computer)</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span><span style=color:#75715e>#nano -w Makefile</span>
+</span></span><span style=display:flex><span>EXTRAVERSION <span style=color:#f92672>=</span> -acr-1
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>make -j3; make modules_install
+</span></span></code></pre></td></tr></table></div></div><h2 id=setting-up-your-boot-environment>Setting up your boot environment</h2><p>When your compile process was successful you will be copy your kernel to your /boot folder (64-bit system). While I have a full encrypted system I need a ramdisk to open my partitions before I boot the initial system. So lets copy and make a ramdisk with the correct modules.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>cp arch/x86_64/boot/bzImage /boot/kernel-4.13.2-acr-1
+</span></span><span style=display:flex><span>mkinitcpio -k 4.13.2-acr-1-ARCH -g /boot/initramfs-linux-4.13.img
+</span></span></code></pre></td></tr></table></div></div><p>And change your boot menu. I used the syslinux boot-manager. So my menu config looks like this.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">8
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">9
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span><span style=color:#75715e>#nano -w /boot/syslinux/syslinux.cfg#</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>LABEL arch-4.13.2-atr-1
+</span></span><span style=display:flex><span>    LINUX ../kernel-4.13.2-atr-1
+</span></span><span style=display:flex><span>    APPEND root<span style=color:#f92672>=</span>/dev/mapper/crypt cryptdevice<span style=color:#f92672>=</span>/dev/sda3:crypt<span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    rootflags<span style=color:#f92672>=</span>subvol<span style=color:#f92672>=</span>__active/root rw intel_iommu<span style=color:#f92672>=</span>on amd_iommu<span style=color:#f92672>=</span>on
+</span></span><span style=display:flex><span>    INITRD ../initramfs-linux-4.13.img
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>syslinux-install_update -iam
+</span></span></code></pre></td></tr></table></div></div><p>And now reboot. If all is correct you will be get the password prompt of the crypt device and you systems boot correctly. But when you look of the size of your kernel&mldr;</p><h2 id=optimize-your-kernel-settings>Optimize your kernel settings</h2><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>du -sh kernel-4.13.2-acr-1-ARCH initramfs-linux-4.13.img
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>5.2M    kernel-4.13.2-acr-1-ARCH
+</span></span><span style=display:flex><span>4.8M    initramfs-linux-4.13.img
+</span></span></code></pre></td></tr></table></div></div><p>This is not the optimization you want to. Its time to optimize your kernel needs.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">8
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>cd /usr/src/linux/linux
+</span></span><span style=display:flex><span>make mrproper
+</span></span><span style=display:flex><span>cp ../config-default ./.config
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#nano -w Makefile</span>
+</span></span><span style=display:flex><span>EXTRAVERSION <span style=color:#f92672>=</span> -acr-2
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>make nconfig
+</span></span></code></pre></td></tr></table></div></div><p>Now you deselect all the options you doesn&rsquo;t need for you computer and your setup.
+Sometimes its a difficult thing but when you look in the description of a kernel feature you will get an recommendation what you should do:</p><p>If you don&rsquo;t know what this means you don&rsquo;t need it.
+or</p><p>This is generally a good idea, so say Y.</p><p>Get you a smaller kernel size like 1MB? Its you challange&mldr;</p></div></article><div id=footer-post-container><div id=footer-post><div id=nav-footer style=display:none><ul><li><a href=/>home</a></li><li><a href=/posts>writings</a></li><li><a href=/lib>lib</a></li><li><a href=/tags>tags</a></li><li><a href=/whoami>whoami</a></li></ul></div><div id=share-footer style=display:none><ul><li><a class=icon href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f" aria-label=Facebook><i class="fab fa-facebook fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="https://twitter.com/share?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&text=Kernel%20Compiling" aria-label=Twitter><i class="fab fa-twitter fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=Linkedin><i class="fab fa-linkedin fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&is_video=false&description=Kernel%20Compiling" aria-label=Pinterest><i class="fab fa-pinterest fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="mailto:?subject=Kernel%20Compiling&body=Check out this article: https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f" aria-label=Email><i class="fas fa-envelope fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="https://getpocket.com/save?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=Pocket><i class="fab fa-get-pocket fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="http://reddit.com/submit?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&title=Kernel%20Compiling" aria-label=reddit><i class="fab fa-reddit fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="http://www.tumblr.com/share/link?url=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&name=Kernel%20Compiling&description=Step%20by%20Step%20kernel%20configuration%20and%20compiling%20for%20your%20system" aria-label=Tumblr><i class="fab fa-tumblr fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fripx80.de%2fposts%2fkernel-compiling%2f&t=Kernel%20Compiling" aria-label="Hacker News"><i class="fab fa-hacker-news fa-lg" aria-hidden=true></i></a></li></ul></div><div id=actions-footer><a id=menu-toggle class=icon href=# onclick='return $("#nav-footer").toggle(),!1' aria-label=Menu><i class="fas fa-bars fa-lg" aria-hidden=true></i> Menu</a>
+<a id=share-toggle class=icon href=# onclick='return $("#share-footer").toggle(),!1' aria-label=Share><i class="fas fa-share-alt fa-lg" aria-hidden=true></i> share</a>
+<a id=top style=display:none class=icon href=# onclick='$("html, body").animate({scrollTop:0},"fast")' aria-label="Top of Page"><i class="fas fa-chevron-up fa-lg" aria-hidden=true></i> Top</a></div></div></div><footer id=footer><div class=footer-left>Copyright &copy; ripx80</div><div class=footer-right><nav><ul><li><a href=/>home</a></li><li><a href=/posts>writings</a></li><li><a href=/lib>lib</a></li><li><a href=/tags>tags</a></li><li><a href=/whoami>whoami</a></li><li><a href=https://ripx80.de/legal>legal notice</a></li><li><a href=https://ripx80.de/privacy>pricacy policy</a></li></ul></nav></div></footer><div id=cookies>if you use this site you accept the usage of cookies. take a closer look under <a href=https://ripx80.de/privacy>privacy policy</a>
+<button id=cookies-btn>accept</button></div><script src=https://ripx80.de/js/custom.js defer></script></div></body><link rel=stylesheet href=/lib/font-awesome/css/all.min.css><script src=/lib/jquery/jquery.min.js></script>
 <script src=/js/main.js></script>
-<script src=/js/code-copy.js></script>
-</html>
+<script src=/js/code-copy.js></script></html>
