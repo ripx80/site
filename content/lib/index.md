@@ -12,32 +12,36 @@ weight: 0
 
 only for self tracking and keep motivated to read more.
 
-some books are censored and not shared with the public :-)
-
 ## reading
 
-01. thinking, fast and slow: daniel kahneman
-02. censored: fear of
+01. thinking, fast and slow - daniel kahneman
+02. atomic habits - james clear
+03. blackout - marc elsberg
+04. the dragonbone chair - tad williams
 
 ## < pipe
 
 01. ego is the enemy - ryan holiday
 02. do the work - steven pressfield
-03. atomic habits - james clear
-04. 365 days with self discipline - martin meadows
-05. ignore everybody - hugh macleod
-06. the war of art - steven pressfield
-07. moonwalking with einstein - joshua foer
-08. how to take smart notes - söhnke ahrens
+03. 365 days with self discipline - martin meadows
+04. ignore everybody - hugh macleod
+05. the war of art - steven pressfield
+06. moonwalking with einstein - joshua foer
+07. how to take smart notes - söhnke ahrens
+
+## read in 2023
+
+goal: 0/1ß
 
 ## read in 2022
 
-goal: 4/10
+goal: 5/10
 
 01. $100 startup - chris guillebeau
-02. censored: wind
-03. censored: knight
+02. the name of the wind - patrick rothfuss
+03. the knight of the seven kingdoms
 04. the diet compass - bas kast
+05. wise man’s fear - patrick rothfuss
 
 ### recommended
 
