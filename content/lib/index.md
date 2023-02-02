@@ -17,9 +17,7 @@ some books are censored and not shared with the public :-)
 ## reading
 
 01. thinking, fast and slow: daniel kahneman
-02. the diet compass - bas kast
-03. censored: wind
-04. censored: knight
+02. censored: fear of
 
 ## < pipe
 
@@ -34,9 +32,12 @@ some books are censored and not shared with the public :-)
 
 ## read in 2022
 
-goal: 1/10
+goal: 4/10
 
-01. $100 startup
+01. $100 startup - chris guillebeau
+02. censored: wind
+03. censored: knight
+04. the diet compass - bas kast
 
 ### recommended
 

@@ -2,7 +2,7 @@ baseURL = 'https://ripx80.de'
 languageCode = 'en-us'
 title = 'ripx80 onexec'
 theme = "cactus"
-copyright = "ripx80 - daniel rittweiler"
+copyright = "ripx80"
 
 [author]
   name = 'ripx80'
