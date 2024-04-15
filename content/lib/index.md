@@ -14,10 +14,10 @@ only for self tracking and keep motivated to read more.
 
 ## reading
 
-01. thinking, fast and slow - daniel kahneman
-02. atomic habits - james clear
-03. blackout - marc elsberg
-04. the dragonbone chair - tad williams
+01. hegels world (hegels welt) - juergen kaube
+02. think in systems - donella h. meadows
+03. auris - vincent kliesch
+04. win (nichts bleibt begraben) - harlan coben
 
 ## < pipe
 
@@ -28,14 +28,39 @@ only for self tracking and keep motivated to read more.
 05. the war of art - steven pressfield
 06. moonwalking with einstein - joshua foer
 07. how to take smart notes - söhnke ahrens
+08. the dragonbone chair - tad williams
+09. the first law - joe abercrombie
+10. best served cold (racheklingen) - joe abercrombie
+11. blood song (das lied des blutes) - anthony ryan
+12. paradise  (das verlorene paradies) - abdulrazak gurnah
+13. great expectations (große erwartungen) - charles dickens
+14. more from tad williams
 
-## read in 2023
+## 2024
 
-goal: 0/1ß
+goal: 1/10
 
-## read in 2022
+01. piranesi - susanna clarke
 
-goal: 5/10
+## 2023
+
+goal: 07/10
+
+01. thinking, fast and slow - daniel kahneman
+02. atomic habits - james clear
+03. blackout - marc elsberg
+04. metro 2033 - dmitry glukhovsky
+05. metro 2034 - dmitry glukhovsky
+06. metro 2035 - dmitry glukhovsky
+07. kings of the wyld - nicholas eames
+
+### leave
+
+01. bloody rose - nicholas eames
+
+## 2022
+
+goal: 05/10
 
 01. $100 startup - chris guillebeau
 02. the name of the wind - patrick rothfuss
@@ -43,11 +68,7 @@ goal: 5/10
 04. the diet compass - bas kast
 05. wise man’s fear - patrick rothfuss
 
-### recommended
-
-### leave
-
-## read in 2021/20
+## 2021/20
 
 01. essentialism: the disciplined pursuit of less - greg mckeown
 02. the why cafe - john strelecky

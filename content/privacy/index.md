@@ -22,7 +22,7 @@ Danziger Str. 27-35, 20099 Hamburg
 
 Telephone: +49 176 47839408
 
-E-Mail: ripx80@protonmail.com
+E-Mail: <ripx80@protonmail.com>
 
 Website: https://ripx80.de
 

@@ -1,153 +1,40 @@
-# nftables
-
-system: x86_64
-kernel: 6.7.9
-date: 2024-04
-nftables: 1.0.9
-
-nftables is the modern Linux kernel (>= 3.13 nft [support](https://git.netfilter.org/nftables/log/doc?showmsg=1)) packet classification framework to replace iptables.
+---
+author: "ripx80"
+title: "nftables - advacned router"
+linktitle: "nftables router"
+description: "configure a nixos system as a router based on nftables"
+date: 2024-04-15
+draft: true
+tags:
+  - network
+  - security
+  - nix
+keywords:
+  - network
+  - security
+  - nix
+weight: 0
+---
 
 ## short
 
-here you will get the basic and usefull cmd for nftables and some usecases how nftables will configured specialized on nixos systems.
-when you will dive deep and get some additional ideas look at (50 things to do with nftables)
+this post will get some advanced rules to configure a nixos system as a wg router and is based on the previous post nftables.
+need additional ideas or use cases? take a look at (50 things to do with nftables) post.
 
-## netfilter
+### context
 
-The netfilter project enables packet filtering, network address [and port] translation (NA[P]T), packet logging, userspace packet queueing and other packet mangling.
+- system: x86_64
+- kernel: 6.7.9
+- nixos: 23.11
+- nftables: 1.0.9
 
-The netfilter hooks are a framework inside the Linux kernel that allows kernel modules to register callback functions at different locations of the Linux network stack. The registered callback function is then called back for every packet that traverses the respective hook within the Linux network stack.
-
-So, netfilter is the Linux framework for manipulating network packets. It can filter and transform packets at predefined points in the kernel.
-
-On top of netfilter sit the firewalls: the venerable iptables, and the new nftables
-
-## nft
-
-some useful commands to interact with nftables and netfilter.
-Note that the position of the statements within your rule is significant,
-because nftables evaluates expressions and statements linearly from left to right.
-
-```sh
-nft --stateless list table filter # list table filter, omit stateful information like counters
-nft --stateless list ruleset # list all nft instructions
-nft list chains # list all chains
-nft -j list ruleset # output json
-nft list ruleset -a # get the handle to delte a rule
-
-nft delete rule inet nixos-fw input-allow handle 17 # delete rule in nixos-fw chain input-allow handle 17
-
-nft -c -o -f ruleset.test  #  read the nft file, optimize ruleset in dry-run mode
-nft monitor # see live changes on ruleset
-
-# change policy of a chain
-nft add ip chain nat PREROUTING '{ policy drop; }' # add chain PREROUTING with default policy drop
-nft add chain ip nat POSTROUTING '{ policy accept; }' # add chain nat POSTROUTING with default policy accept
-```
-
-## families
-
-nft has different family types to interact with:
-
-- ip: only see ipv4 traffic
-- ip6: only see ipv6 traffic
-- inet: Tables of this family see both IPv4 and IPv6 traffic/packets, simplifying dual stack support.
-- arp: arp level traffic
-- bridge:  traffic/packets traversing bridges
-- netdev: The netdev family is different from the others in that it is used to create base chains attached to a single network interface. Such base chains see all network traffic on the specified interface, with no assumptions about L2 or L3 protocols.
-
-## nft debugging
-
-with ```sh nft monitor``` you can see live rules changes
-todo: more input and examples
-
-```sh
-nft monitor
-```
-
-## nftrace
-
-todo: more input and examples
-
-```sh
-nft monitor trace
-```
-
-## nftables with nixos
-
-nixos: 23.11
 nixos modules:
 
 - [firewall](https://github.com/NixOS/nixpkgs/blob/nixos-23.11/nixos/modules/services/networking/firewall.nix)
 - [firewall-nftables](https://github.com/NixOS/nixpkgs/blob/nixos-23.11/nixos/modules/services/networking/firewall-nftables.nix)
 - [nftables](https://github.com/NixOS/nixpkgs/blob/nixos-23.11/nixos/modules/services/networking/nftables.nix)
 
-nftables can be enabled with the nixos setting ```nix network.nftables.enable = true;```. This will add the **pkgs.nftables** to your system environment and create a default ruleset for your system.
-
-```nft
-# default name nixos-fw, inet is for ipv4 and ipv6 traffic
-table inet nixos-fw {
-    # chain for reverse path filtering and dhcp
-    chain rpfilter {
-        # this will change the priority of mangle to 10 and a default chain policy to drop
-        type filter hook prerouting priority mangle + 10; policy drop;
-        # this will open dhcpv4 on port 68 and 67 bootp
-        meta nfproto ipv4 udp sport . udp dport { 68 . 67, 67 . 68 } accept comment "DHCPv4 client/server"
-        # check reverse path, see cfg.checkReversePath
-        fib saddr . mark . iif oif exists accept
-    }
-    # default input chain
-    chain input {
-        # filter with default drop policy
-        type filter hook input priority filter; policy drop;
-        # lo is a trusted interface, see networking.firewall.trustedInterfaces
-        iifname "lo" accept comment "trusted interfaces"
-        # track the state of the conntrack, new and untracked will handled in input-allow
-        ct state vmap { invalid : drop, established : accept, related : accept, new : jump input-allow, untracked : jump input-allow }
-    }
-    # allow dhcpv6 without any trusted ports defined in networking.firewall.allowedTCPPorts
-    chain input-allow {
-        icmpv6 type != { nd-redirect, 139 } accept comment "Accept all ICMPv6 messages except redirects and node information queries (type 139).  See RFC 4890, section 4.4."
-        ip6 daddr fe80::/64 udp dport 546 accept comment "DHCPv6 client"
-    }
-}
-```
-
-this is the default ruleset when nftables is enabled on a nixos system.
-you can see the function of each instruction in the comments or look into the nixos modules.
-other interesting options can find under ```nix network.firewall``:
-
-- logReversePathDrops
-- logRefusedConnections
-- logRefusedPackets
-- logRefusedUnicastsOnly
-- rejectPackets
-- allowPing
-- pingLimit
-
-this is my default configuration without overwrite the entire ruleset and use the nixos modules options:
-
-```nix
-networking = {
-  firewall = {
-      enable = true;
-      logRefusedConnections = false;
-      logRefusedPackets = false;
-      allowPing = false;
-      interfaces.eth0 = {
-        # my wireguard port ready to connect to the outside world.
-        allowedUDPPorts = [ meta.${config.networking.hostName}.wg.port ];
-      };
-      # on wg only ssh and dns are open
-      interfaces.wg0 = {
-        allowedTCPPorts = [ 22 53 ];
-        allowedUDPPorts = [ 53 ];
-      };
-    };
-};
-```
-
-### nat
+## nat
 
 network address translation ([nat](https://wiki.nftables.org/wiki-nftables/index.php/Performing_Network_Address_Translation_(NAT))) will allow you to route packets to different networks.
 i will use this to allow my wireguard clients the connection to the outside world via eth0, so you can build your own vpn server with masquerading.
@@ -479,69 +366,15 @@ firewall.enable = true;
 
 ```
 
-## learned
-
-- [doc](https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt):
-  Difference between net.ipv4.conf.all.forwarding and net.ipv4.ip_forward.
-
-- sysctl --system shows all system settings without a config file
-- ip mangle table: It is basically used to set specific headers for IP packets to affect the routing decision made further on. like mtu or ttl.
-- nixos opens automaticly dhcp ipv4 and ipv6 ports when networking.firewall.enable = true.
-- nixos networking.firewall.checkReversePath is default true
-
-- postrouting:
-- prerouting:
-- masquerade: Masquerade is a special case of SNAT, where the source address is automagically set to the address of the output interface.
-- redirect: By using redirect, packets will be forwarded to local machine. Is a special case of DNAT where the destination is the current machine.
-- netcat host port (tcp connection)
-- netcat -u host port (udp connection)
-- netcat -z -v domain.com 1-1000 # port scanning
-- netcat -l 4444 # listen
-- netcat -l 4444 > received_file # files through
-- netcat domain.com 4444 < original_file
-- printf 'HTTP/1.1 200 OK\n\n%s' "$(cat index.html)" | netcat -l 8888 # http://server_IP:8888
-- ${pkgs.iproute}/bin/ip link set mtu 1400 dev wg0
-- journalctl -f read on the fly, journalctl -k only kernel messages like nftables, journal -k --priority=4 (show priority level 4 like nftables)
-- tcpdump -i eth0 host ip-95-223-229-27.hsi16.unitymediagroup.de and not port 58432
-
-## docs
-
-- [wiki](https://wiki.nftables.org/wiki-nftables/index.php/Main_Page)
-- [timeline log](https://git.netfilter.org/nftables/log/doc?showmsg=1) of nft development
-- in [10 minutes](https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes)
-- [nftables on nixos](https://scvalex.net/posts/54/)
-- [flowtables](https://wiki.nftables.org/wiki-nftables/index.php/Flowtables)
-- [flowtables kernel](https://docs.kernel.org/networking/nf_flowtable.html)
-- [deep explaination of flowtables](https://thermalcircle.de/doku.php?id=blog:linux:flowtables_1_a_netfilter_nftables_fastpath)
-- [nixos-home-router](https://francis.begyn.be/blog/nixos-home-router)
-- [nixos-router](https://pavluk.org/blog/2022/01/26/nixos_router.html)
-- [wireguard nftables](https://www.procustodibus.com/blog/2021/11/wireguard-nftables/)
-
-## todo
-
-- iif canot be used in checkRuleset in nixos use ifname instead
-- a way to log only valid ssh credentials logins?
-
-- The connection tracking system supports accounting, which means counting packets and bytes for each flow and for each flow direction. This feature is deactivated by default. You can activate it with this sysctl:
-sysctl -w net.netfilter.nf_conntrack_acct=1
-conntrack -L
-
-- #iif $if_in oif $if_out accept comment "only from all clients in internal to internet"
-- add per src_ip network counters like ssh or dns
-- counter for network traffic per src_ip
-- QoS with nftables?
-- loadbalancing nexthop
-- how can you test the speed of fw?
-
 ## how to check rules are correct and working?
 
 ```sh
-ping -t <target IP> -l 65500 # ping flood
+ping -t 192.168.1.1 -l 65500 # ping flood
 
-dog -U -n 192.168.100.1 google.de # test udp dns query
-dog -T -n 192.168.100.1 google.de # test tcp dns query
+dog -U -n 192.168.1.1 google.de # test udp dns query
+dog -T -n 192.168.1.1 google.de # test tcp dns query
 
-ssh 192.168.100.1 # ssh counter and log entry
+ssh 192.168.1.1 # ssh counter and log entry
 
 nft list counters
 ```
@@ -570,10 +403,10 @@ journalctl -k --priority=4 | tail
 ```
 
 ```sh
-nmap -sN 192.168.100.1 -p22 # counter increase by two null packets
-nmap -sF 192.168.100.1 -p22 # not in counter
-nmap -sX 192.168.100.1 -p22 # counter increase by two xmas
-nmap -sS --scanflags SYNFIN 192.168.100.1 -p22 # URG, ACK, PSH, RST, SYN, and FIN
+nmap -sN 192.168.1.1 -p22 # counter increase by two null packets
+nmap -sF 192.168.1.1 -p22 # not in counter
+nmap -sX 192.168.1.1 -p22 # counter increase by two xmas
+nmap -sS --scanflags SYNFIN 192.168.1.1 -p22 # URG, ACK, PSH, RST, SYN, and FIN
 # no example found to send uncommon mss values
 
 ```
@@ -593,3 +426,13 @@ table inet fw {
 ```
 
 nft list set inet filter https
+
+## learned
+
+- postrouting:
+- prerouting:
+- masquerade: Masquerade is a special case of SNAT, where the source address is automagically set to the address of the output interface.
+- redirect: By using redirect, packets will be forwarded to local machine. Is a special case of DNAT where the destination is the current machine.
+- ${pkgs.iproute}/bin/ip link set mtu 1380 dev wg0 # set the mtu of wg0 interface to 1380
+- journalctl -f read on the fly, journalctl -k only kernel messages like nftables, journal -k --priority=4 (show priority level 4 like nftables)
+- tcpdump -i eth0 host 38.10.10.1 and not port 58432

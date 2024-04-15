@@ -6,6 +6,11 @@
             "desc": "brewman cyberbrew"
         },
         {
+            "name": "snoop-rs",
+            "url": "https://docs.rs/snoop/latest/snoop/",
+            "desc": "snoop lib in rust"
+        },
+        {
             "name": "skipper",
             "url": "https://github.com/zalando/skipper",
             "desc": "(contributor) skipper http router"

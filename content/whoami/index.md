@@ -51,7 +51,7 @@ you can see the most of the projects on my github profile but some projects are 
 
 ## contact
 
-- email: ripx80@protonmail.com
+- email: <ripx80@protonmail.com>
 - github: [ripx80](https://github.com/ripx80)
 
 ## books
