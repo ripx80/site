@@ -28,3 +28,5 @@
 - check compiling guide for linux
 - nix write derivations
 - (I) - post template
+- how i set up nix secrets
+- factorio base design
