@@ -251,6 +251,19 @@ i can only recommend looking into the sources given to familiarize yourself with
 
 time to get hands dirty for the real project of this journey: the nixos wireguard router with vpn support (comming soon).
 
+## docs
+
+- [wiki](https://wiki.nftables.org/wiki-nftables/index.php/main_page)
+- [timeline log](https://git.netfilter.org/nftables/log/doc?showmsg=1) of nft development
+- [nft in 10 minutes](https://wiki.nftables.org/wiki-nftables/index.php/quick_reference-nftables_in_10_minutes)
+- [nftables on nixos](https://scvalex.net/posts/54/)
+- [flowtables](https://wiki.nftables.org/wiki-nftables/index.php/flowtables)
+- [flowtables kernel](https://docs.kernel.org/networking/nf_flowtable.html)
+- [deep explaination of flowtables](https://thermalcircle.de/doku.php?id=blog:linux:flowtables_1_a_netfilter_nftables_fastpath)
+- [nixos-home-router](https://francis.begyn.be/blog/nixos-home-router)
+- [nixos-router](https://pavluk.org/blog/2022/01/26/nixos_router.html)
+- [wireguard nftables](https://www.procustodibus.com/blog/2021/11/wireguard-nftables/)
+
 ## learned
 
 - [difference](https://www.kernel.org/doc/documentation/networking/ip-sysctl.txt) between net.ipv4.conf.all.forwarding and net.ipv4.ip_forward.
@@ -271,16 +284,3 @@ nc -l 4444 > received_file # files through
 nc domain.com 4444 < original_file
 nc 'http/1.1 200 ok\n\n%s' "$(cat index.html)" | netcat -l 8888 # http://server_ip:8888
 ```
-
-## docs
-
-- [wiki](https://wiki.nftables.org/wiki-nftables/index.php/main_page)
-- [timeline log](https://git.netfilter.org/nftables/log/doc?showmsg=1) of nft development
-- [nft in 10 minutes](https://wiki.nftables.org/wiki-nftables/index.php/quick_reference-nftables_in_10_minutes)
-- [nftables on nixos](https://scvalex.net/posts/54/)
-- [flowtables](https://wiki.nftables.org/wiki-nftables/index.php/flowtables)
-- [flowtables kernel](https://docs.kernel.org/networking/nf_flowtable.html)
-- [deep explaination of flowtables](https://thermalcircle.de/doku.php?id=blog:linux:flowtables_1_a_netfilter_nftables_fastpath)
-- [nixos-home-router](https://francis.begyn.be/blog/nixos-home-router)
-- [nixos-router](https://pavluk.org/blog/2022/01/26/nixos_router.html)
-- [wireguard nftables](https://www.procustodibus.com/blog/2021/11/wireguard-nftables/)
