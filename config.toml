@@ -22,10 +22,11 @@ showAllPostsArchive = true
 logo = "images/garry-64.webp"
 css = ["css/custom.css"]
 
-
 # Post page settings
 show_updated = true # default
 showReadTime = true # default
+
+googleAnalyticsAsync = false
 
 # cookies
 [params.cookies]

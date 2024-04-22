@@ -21,8 +21,6 @@ weight: 0
 this post will get some advanced rules to configure a nixos system as a wg router and is based on the previous post nftables.
 need additional ideas or use cases? take a look at (50 things to do with nftables) post.
 
-### context
-
 - system: x86_64
 - kernel: 6.7.9
 - nixos: 23.11
