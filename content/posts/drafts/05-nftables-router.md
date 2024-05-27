@@ -579,4 +579,3 @@ todo: if wg0 is not present when ingress chain starts it will fail. normaly you 
 - iif: must be present, index number, not at runtime, lo and all phx interfaces
 - iifname: must not be present, string lookup for index, at runtime, all dynamical interfaces like wg0
 - for advanced stuff, dont use the nixos module: different systemd oneshots, combine together when restart/flush
-

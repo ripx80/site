@@ -38,3 +38,6 @@
 - write down acutal dev practices: seperate page on website with the very important ones
 - high documentation, low meeting culture
 - rust errors post
+- nixos with unbound article
+- nixos routing article
+- nixos gluetun article
