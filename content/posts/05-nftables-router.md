@@ -1,6 +1,6 @@
 ---
 author: "ripx80"
-title: "nftables - advacned router"
+title: "nftables - advanced router"
 linktitle: "nftables router"
 description: "configure a nixos system as a router based on nftables"
 date: 2024-05-31
