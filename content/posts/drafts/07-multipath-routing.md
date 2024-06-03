@@ -19,6 +19,7 @@ split up in three parts:
     - part-2: multipath routing
     - part-3: multipath routing on nixos
 
+- switch to nftables
 - graph which table will be selected by rules
 - use a simple use case:
   - ping localhost
