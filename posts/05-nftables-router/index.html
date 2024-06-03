@@ -1,0 +1,786 @@
+<!doctype html><html lang=en-us><head><link rel=preload href=/lib/font-awesome/webfonts/fa-brands-400.woff2 as=font type=font/woff2 crossorigin=anonymous><link rel=preload href=/lib/font-awesome/webfonts/fa-regular-400.woff2 as=font type=font/woff2 crossorigin=anonymous><link rel=preload href=/lib/font-awesome/webfonts/fa-solid-900.woff2 as=font type=font/woff2 crossorigin=anonymous><link rel=preload href=/lib/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2 as=font type=font/woff2 crossorigin=anonymous><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><title>nftables - advacned router | ripx80 onexec</title>
+<link rel=canonical href=https://ripx80.de/posts/05-nftables-router/><meta name=description content="ripx80 technical thoughts and try to memorize yesterday"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="all,follow"><meta name=googlebot content="index,follow,snippet,archive"><meta property="og:title" content="nftables - advacned router"><meta property="og:description" content="configure a nixos system as a router based on nftables"><meta property="og:type" content="article"><meta property="og:url" content="https://ripx80.de/posts/05-nftables-router/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2024-05-31T00:00:00+00:00"><meta property="article:modified_time" content="2024-05-31T00:00:00+00:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="nftables - advacned router"><meta name=twitter:description content="configure a nixos system as a router based on nftables"><link rel=stylesheet href=https://ripx80.de/css/styles.94f653e9e151e28067a7c5dbbc4600cbd5a3c721e79faaf971e523c40f3b249b8e4f20bb57810dfffa8d559ca5c140fd56eb4cd9c0853113ad08e66afdb08bdd.css integrity="sha512-lPZT6eFR4oBnp8XbvEYAy9WjxyHnn6r5ceUjxA87JJuOTyC7V4EN//qNVZylwUD9VutM2cCFMROtCOZq/bCL3Q=="><link rel=stylesheet href=https://ripx80.de/css/custom.css><!--[if lt IE 9]><script src=https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js></script><script src=https://oss.maxcdn.com/respond/1.4.2/respond.min.js></script><![endif]--><link rel=icon type=image/png href=https://ripx80.de/images/favicon.ico></head><body class="max-width mx-auto px3 ltr"><div class="content index py4"><div id=header-post><a id=menu-icon href=#><i class="fas fa-bars fa-lg"></i></a>
+<a id=menu-icon-tablet href=#><i class="fas fa-bars fa-lg"></i></a>
+<a id=top-icon-tablet href=# onclick='$("html, body").animate({scrollTop:0},"fast")' style=display:none aria-label="Top of Page"><i class="fas fa-chevron-up fa-lg"></i></a>
+<span id=menu><span id=nav><ul><li><a href=/>home</a></li><li><a href=/posts>writings</a></li><li><a href=/lib>lib</a></li><li><a href=/tags>tags</a></li><li><a href=/whoami>whoami</a></li></ul></span><br><span id=actions><ul><li><a class=icon href=https://ripx80.de/posts/04-nftables/ aria-label=Previous><i class="fas fa-chevron-left" aria-hidden=true onmouseover='$("#i-prev").toggle()' onmouseout='$("#i-prev").toggle()'></i></a></li><li><a class=icon href=# onclick='$("html, body").animate({scrollTop:0},"fast")' aria-label="Top of Page"><i class="fas fa-chevron-up" aria-hidden=true onmouseover='$("#i-top").toggle()' onmouseout='$("#i-top").toggle()'></i></a></li><li><a class=icon href=# aria-label=Share><i class="fas fa-share-alt" aria-hidden=true onmouseover='$("#i-share").toggle()' onmouseout='$("#i-share").toggle()' onclick='return $("#share").toggle(),!1'></i></a></li></ul><span id=i-prev class=info style=display:none>Previous post</span>
+<span id=i-next class=info style=display:none>Next post</span>
+<span id=i-top class=info style=display:none>Back to top</span>
+<span id=i-share class=info style=display:none>Share post</span></span><br><div id=share style=display:none><ul><li><a class=icon href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f" aria-label=Facebook><i class="fab fa-facebook" aria-hidden=true></i></a></li><li><a class=icon href="https://twitter.com/share?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&text=nftables%20-%20advacned%20router" aria-label=Twitter><i class="fab fa-twitter" aria-hidden=true></i></a></li><li><a class=icon href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&title=nftables%20-%20advacned%20router" aria-label=Linkedin><i class="fab fa-linkedin" aria-hidden=true></i></a></li><li><a class=icon href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&is_video=false&description=nftables%20-%20advacned%20router" aria-label=Pinterest><i class="fab fa-pinterest" aria-hidden=true></i></a></li><li><a class=icon href="mailto:?subject=nftables%20-%20advacned%20router&body=Check out this article: https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f" aria-label=Email><i class="fas fa-envelope" aria-hidden=true></i></a></li><li><a class=icon href="https://getpocket.com/save?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&title=nftables%20-%20advacned%20router" aria-label=Pocket><i class="fab fa-get-pocket" aria-hidden=true></i></a></li><li><a class=icon href="http://reddit.com/submit?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&title=nftables%20-%20advacned%20router" aria-label=reddit><i class="fab fa-reddit" aria-hidden=true></i></a></li><li><a class=icon href="http://www.tumblr.com/share/link?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&name=nftables%20-%20advacned%20router&description=configure%20a%20nixos%20system%20as%20a%20router%20based%20on%20nftables" aria-label=Tumblr><i class="fab fa-tumblr" aria-hidden=true></i></a></li><li><a class=icon href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&t=nftables%20-%20advacned%20router" aria-label="Hacker News"><i class="fab fa-hacker-news" aria-hidden=true></i></a></li></ul></div></span></div><article class=post itemscope itemtype=http://schema.org/BlogPosting><header><h1 class=posttitle itemprop="name headline">nftables - advacned router</h1><div class=meta><div class=postdate><time datetime="2024-05-31 00:00:00 +0000 UTC" itemprop=datePublished>2024-05-31</time></div><div class=article-read-time><i class="far fa-clock"></i>
+23 minute read</div><div class=article-tag><i class="fas fa-tag"></i>
+<a class=tag-link href=/tags/network rel=tag>network</a>
+,
+<a class=tag-link href=/tags/security rel=tag>security</a>
+,
+<a class=tag-link href=/tags/nftables rel=tag>nftables</a>
+,
+<a class=tag-link href=/tags/nix rel=tag>nix</a></div></div></header><div id=toc><nav id=TableOfContents><ul><li><a href=#short>short</a></li><li><a href=#nft>nft</a></li><li><a href=#network-struct>network struct</a></li><li><a href=#iif-and-iifname>iif and iifname</a></li><li><a href=#nftables-struct>nftables struct</a></li><li><a href=#icmp---limit-and-couters>icmp - limit and couters</a></li><li><a href=#services---named-counters>services - named counters</a></li><li><a href=#protect-sensitive-servies>protect sensitive servies</a></li><li><a href=#forwarding-and-nat>forwarding and nat</a><ul><li><a href=#nat---vpn>nat - vpn</a></li><li><a href=#nat---vpn-restricted>nat - vpn restricted</a></li><li><a href=#wg---client-communication>wg - client communication</a></li></ul></li><li><a href=#flowtables>flowtables</a></li><li><a href=#complete-ruleset>complete ruleset</a></li><li><a href=#testing-ruleset>testing ruleset</a></li><li><a href=#docs>docs</a></li><li><a href=#learned>learned</a></li></ul></nav></div><div class=content itemprop=articleBody><h2 id=short>short</h2><p>this post deals with some advanced rules and configurations to build router based on the previous post about <a href=https://ripx80.de/posts/04-nftables/>nftables - basics</a>.
+the focus is in general on nftables but the whole thing is build on a nixos system.</p><p>if you need additional ideas or use cases? take a look at the blog (comming soon) post.</p><ul><li>system: x86_64</li><li>kernel: 6.7.9</li><li>nixos: 23.11</li><li>nftables: 1.0.9</li><li>libressl-3.8.2-nc (netcat)</li><li>wireguard</li></ul><p>nixos modules:</p><ul><li><a href=https://github.com/NixOS/nixpkgs/blob/nixos-23.11/nixos/modules/services/networking/firewall.nix>firewall</a></li><li><a href=https://github.com/NixOS/nixpkgs/blob/nixos-23.11/nixos/modules/services/networking/firewall-nftables.nix>firewall-nftables</a></li><li><a href=https://github.com/NixOS/nixpkgs/blob/nixos-23.11/nixos/modules/services/networking/nftables.nix>nftables</a></li></ul><h2 id=nft>nft</h2><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>nft flush ruleset <span style=color:#75715e># clear, flush the entire ruleset</span>
+</span></span><span style=display:flex><span>nft list counters <span style=color:#75715e># list named counters</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># nft syntax for the logging statement</span>
+</span></span><span style=display:flex><span>nft add rule inet fw services iifname wg0 tcp dport <span style=color:#ae81ff>22</span> ct state new log prefix <span style=color:#ae81ff>\&#34;</span><span style=color:#f92672>[</span>nftables<span style=color:#f92672>]</span> new ssh accepted: <span style=color:#ae81ff>\&#34;</span> accept comment <span style=color:#e6db74>&#34;allow and log ssh&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=network-struct>network struct</h2><p>the general struct of the network is a central router in the internet, reachable over its public ip (example here: 80.1.1.1).
+clients will connect via open wireguard <strong>port 3000</strong> on <strong>eth0</strong> to internal network <strong>wg0</strong> (192.168.1.0/24).
+they can communicate with each other via the router and has no direct communication over a mesh network.
+the traffic are routed via nat masquerade to the outsite like a vpn provider does.</p><ul><li>wg0: 192.168.1.0/24</li><li>router: 192.168.1.1/32</li><li>client 1: 192.168.1.2/32</li><li>client 2: 192.168.1.3/32</li><li>client 3: 192.168.1.4/32</li></ul><h2 id=iif-and-iifname>iif and iifname</h2><p>before we start with nft rulesets and features we must understand the difference between <strong>iif</strong> and <strong>iifname</strong>.
+for me it was not clear at the beginning what exactly is the difference so i used only iif because i had read its faster.
+after some time i run into a problem when i update my system and the service nftables and wireguard-wg0 updated and restarted.</p><p>nftables could not be restart successful because wg0 was not available to this time.
+because of this i canot log into my server anymore. the ssh service was unreacable but after a restart of the server i can <strong>fortunately</strong> login again.
+after some deep dive sessions i learnd the <a href=https://serverfault.com/questions/985158/what-is-the-difference-between-iifname-and-iif-in-nftables>difference</a> and the problem with non-static ethernet interfaces.</p><p><strong>iif</strong> looks up and compares the interface index of a packet. so it uses less resources because it&rsquo;s a integer in the <a href=https://github.com/torvalds/linux/blob/v4.19/include/linux/skbuff.h#L628>packet</a> when it pass the network stack.
+so no lookup or string comparsion is needed only a comparsion of the number.
+The problem is, when a interface is deleted, recreated with a new index number or it&rsquo;s not available at the time when nftables parse the ruleset the index is not available or not match.
+index values are not reassigned again for a new created interface. it will be only increased, so the index will not match any packet anymore.</p><p>a good example when <strong>iif</strong> should be used is the loopback (lo) interface.
+the index of this interface is garanteed, its always the first interface with normaly the index number <strong>1</strong>. It can not be deleted or added a second time.
+this can be verified with</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>ip address show lo
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu <span style=color:#ae81ff>65536</span> qdisc noqueue state UNKNOWN group default qlen <span style=color:#ae81ff>1000</span>
+</span></span><span style=display:flex><span>    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+</span></span><span style=display:flex><span>    inet 127.0.0.1/8 scope host lo
+</span></span><span style=display:flex><span>       valid_lft forever preferred_lft forever
+</span></span></code></pre></td></tr></table></div></div><p>the first number on the left is the index number of the interface <strong>lo</strong>.</p><p><strong>iifname</strong> on the other side does a string comparsion with the interface name to lookup the index at runtime.
+this need more resources but you can create a rule for a non-existing interface or not existing at the moment nftables parse the rules.
+additionaly <strong>iifname</strong> can match wildcards like <strong>wg</strong>*, for all wireguard interfaces beginning with <strong>wg</strong>.</p><p><strong>what is recommended to use?</strong></p><ul><li><strong>iif</strong> should be used for stable interfaces that won&rsquo;t change once created like physical interfaces or the loopback interface. this interface must be guaraneed at boot and when the ruleset is parsed.</li><li><strong>iifname</strong> should be used for dynamic interfaces not known at boot, not created at ruleset parsing or for wildcard matches.</li></ul><p>to address the problem described above the wireguard interface wg0 was not available when nftables was restarted and parsed the ruleset where iif was defined for wg0.
+after change to iifname on dynamic interfaces i can build the configuration on a remote system and it can be lookup indexes on runtime.</p><p>one expection is the <a href=https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks><strong>ingress</strong> hook</a> of nftables. here only iif statements are accepted. so only stable interfaces can be defined or it must be safe to define a dynamic interface like wg0.
+it must be enshured that the dynamic interface is present when the ingress rules are applied. you can do that with a second nftables systemd service that is start after the wg0 interface is created.</p><p>for advanced stuff or using ingress for dynamic interfaces, dont use the nixos module.
+define different systemd oneshots and combine them together when they start/stop/restart/flush.</p><h2 id=nftables-struct>nftables struct</h2><p>i think it&rsquo;s always good to know exactly who sets which rules when and to find them in one place in my config.
+because of that, when i have a more advanced ruleset i overwrite all default nixos rules with a <strong>networking.nftables.ruleSet</strong> and flush all previous rules with <strong>flush ruleset</strong>.
+this usually allows you to attach additional rules to the existing ruleset of nftables, which is generated by the various options in nixos.
+an example of such a ruleset can be found in the previous post about nftables.</p><p>however, in order to reach the previous targets, the entire ruleset which nixos generated is discarded.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>network <span style=color:#f92672>=</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>   <span style=color:#75715e># enable firewall, don&#39;t care about default options</span>
+</span></span><span style=display:flex><span>  firewall.enable <span style=color:#f92672>=</span> true;
+</span></span><span style=display:flex><span>  nftables <span style=color:#f92672>=</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    enable <span style=color:#f92672>=</span> true;
+</span></span><span style=display:flex><span>    ruleSet <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;&#39;</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># flush the entire ruleset, place at the beginning</span>
+</span></span><span style=display:flex><span>    flush ruleset
+</span></span><span style=display:flex><span>    <span style=color:#75715e># append new rules here</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>the nixos defaults will always be in the evaluated file but flushed and new rules appended.
+now fresh and a clean table its time to start to do something useful.</p><p>the default struct of my tables look like this.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">18
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>table inet fw <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  chain rpfilter <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    type filter hook prerouting priority mangle + 10; policy drop
+</span></span><span style=display:flex><span>    fib saddr . mark . iif oif exists accept comment <span style=color:#e6db74>&#34;reverse path check&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>  chain input <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>     type filter hook input priority 0; policy drop
+</span></span><span style=display:flex><span>     iif lo accept comment <span style=color:#e6db74>&#34;trusted interfaces&#34;</span>
+</span></span><span style=display:flex><span>     ct state vmap <span style=color:#f92672>{</span> invalid : drop, established : accept, related : accept, new : jump services, untracked : jump services <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  chain output <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    type filter hook output priority 0; policy drop;
+</span></span><span style=display:flex><span>    ct state vmap <span style=color:#f92672>{</span> invalid : drop, established : accept, related : accept, new : accept, untracked : accept <span style=color:#f92672>}</span> comment <span style=color:#e6db74>&#34;allow outgoing packages&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>  chain services <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>i adopt some rules from the default nixos-fw like the <strong>rpfilter</strong> chain and set defaults to the chains and vmaps for the <strong>ct state</strong> (contrackt state).
+if you want to read more in detail informations about <a href=https://wiki.nftables.org/wiki-nftables/index.php/Verdict_Maps_(vmaps)>verdict map</a>.
+a seperate <strong>services</strong> chain is created to group system services like ssh or dns.</p><p>to processed these rules in the input chain is the statement <strong>jump</strong> for new and untracked connections.
+nftables will jump to the <strong>services</strong> chain and look for more detailed instructions.
+after processed all rules in <strong>services</strong> it will jump back to the position left.
+note that when you use a <strong>goto</strong> statement instead of <strong>jump</strong>, nftables will not jump back to the prevoius position. if no rule match the default policy kicks in.</p><p>with this basic ruleset the firewall can be get some useful instructions.
+the next sections are incremental to the ruleset above. at the end of this article you can see a full rulset of all statements.</p><h2 id=icmp---limit-and-couters>icmp - limit and couters</h2><p>on the most maschines icmp echo requests are allowed (pong of the ping)
+but its a good idea to rate limit the icmp echo-request to prevent ping-floods.
+because we limit more things than icmp rates the <strong>limit</strong> statement will be used to create a named limit and group all limits at the beginning of the table <strong>inet fw</strong>.
+also we want to count the number of requests and use the <strong>counter</strong> statement to create a unamed counter.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">8
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>table inet fw <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    limit lim_icmp <span style=color:#f92672>{</span> rate 10/second ; comment <span style=color:#e6db74>&#34;no ping floods, allow 10 requests per second&#34;</span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    chain input <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        icmp type echo-request limit name lim_icmp counter accept comment <span style=color:#e6db74>&#34;no ping floods and allow pings&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=services---named-counters>services - named counters</h2><p>to allow clients to connect to the services we used the <strong>services</strong> chain.
+only the wireguard service should be reachable from the internet on <strong>eth0</strong>, so the wireguard clients can connect to the inner wireguard network <strong>wg0</strong> on port 3000.
+in addition a internal dns service is run for the internal network and use a limit and a named counter for queries over udp and tcp.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">17
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>table inet fw <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  limit lim_dns <span style=color:#f92672>{</span> rate 150/second ; comment <span style=color:#e6db74>&#34;no dns floods, allow 150 queries per second&#34;</span> <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  counter cnt_dns <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    comment <span style=color:#e6db74>&#34;count dns over udp packets&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>  counter cnt_dns_tcp <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    comment <span style=color:#e6db74>&#34;count dns over tcp packets&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  chain services <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    iif <span style=color:#e6db74>&#34;eth0&#34;</span> udp dport <span style=color:#ae81ff>3000</span> accept comment <span style=color:#e6db74>&#34;open wg port to the internet&#34;</span>
+</span></span><span style=display:flex><span>    iifname <span style=color:#e6db74>&#34;wg0&#34;</span> udp dport <span style=color:#ae81ff>53</span> limit name lim_dns counter name cnt_dns accept comment <span style=color:#e6db74>&#34;limit dns queries on interface&#34;</span>
+</span></span><span style=display:flex><span>    iifname <span style=color:#e6db74>&#34;wg0&#34;</span> tcp dport <span style=color:#ae81ff>53</span> limit name lim_dns counter name cnt_dns_tcp accept comment <span style=color:#e6db74>&#34;limit dns queries on interface&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=protect-sensitive-servies>protect sensitive servies</h2><p>the ssh daemon is a sensitive service. in this setup it should be only accessable in the internal network <strong>wg0</strong> and not from the internet.
+everytime a user create a new ssh connection this must be counted and logged to the kernel log.
+to protect the service from bruteforce attacks we need a mechanism like <strong>fail2ban</strong> but with only nft statemens.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">21
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>
+</span></span><span style=display:flex><span>table inet fw <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  counter cnt_ssh <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    comment <span style=color:#e6db74>&#34;count ssh packets&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  limit lim_ssh <span style=color:#f92672>{</span> rate over 10/minute <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  set deny_v4 <span style=color:#f92672>{</span> type ipv4_addr ; flags dynamic, timeout ; timeout 5m ; comment <span style=color:#e6db74>&#34;deny list of blocked ip addresses&#34;</span>;<span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  chain input <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    ip saddr @deny_v4 drop comment <span style=color:#e6db74>&#34;drop all clients from blocking list&#34;</span>
+</span></span><span style=display:flex><span>    ct state vmap <span style=color:#f92672>{</span> invalid : drop, established : accept, related : accept, new : jump services, untracked : jump services <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  chain services <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    iifname <span style=color:#e6db74>&#34;wg0&#34;</span> tcp dport <span style=color:#ae81ff>22</span> ct state new, untracked limit name lim_ssh update @deny_v4 <span style=color:#f92672>{</span> ip saddr <span style=color:#f92672>}</span> comment <span style=color:#e6db74>&#34;limit ssh connection in time to blocking list&#34;</span>
+</span></span><span style=display:flex><span>    iifname <span style=color:#e6db74>&#34;wg0&#34;</span> tcp dport <span style=color:#ae81ff>22</span> ct state new counter name cnt_ssh log prefix <span style=color:#e6db74>&#34;[nftables] new ssh connection: &#34;</span> accept comment <span style=color:#e6db74>&#34;allow, log, count new ssh connections&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>normaly this logs are send to journald on most linux distributions and you can inspect these logs via journalctl.
+the default priority is <strong>4</strong> for nftables logs if you have not set another priority.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>journalctl -k --priority<span style=color:#f92672>=</span><span style=color:#ae81ff>4</span> <span style=color:#75715e># show priority level 4 like nftables</span>
+</span></span></code></pre></td></tr></table></div></div><p>when you connected to the internet you will see a lot of login attempts to your ssh port. yes we a live in a bad world, because bots and scanners try to login or check your open ports.</p><div class=speechbubble><div class=garry><img src=https://ripx80.de/images/garry-64.webp alt=garry></div><div class=chat><p><span class=whisper></span>
+keep in mind: when you forget to set the interface with iifname wg0 the ssh service will be open on all interfaces!</p></div></div><p>now only ssh connections on the internal wireguard interface &ldquo;wg0&rdquo; are allowed. you can verify this in the kernel log or try to connect with a ssh client to eth0 and wg0.</p><h2 id=forwarding-and-nat>forwarding and nat</h2><p>to allow my wireguard clients the connection to the outside world via the network interface &rsquo;eth0&rsquo; i use the nat masquerading technique to route the client traffic like a vpn provider.
+the first step is to enable packet forwarding in the linux kernel. on the most linux systems you can do that with sysctl or write driect to /proc.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>sysctl --system
+</span></span><span style=display:flex><span>net.ipv4.conf.all.forwarding <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>net.ipv4.conf.default.forwarding <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>
+</span></span></code></pre></td></tr></table></div></div><p>on a nixos system this will be done via the option <strong>&lsquo;boot.kernel.sysctl&rsquo;</strong> in the system configfile.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nix data-lang=nix><span style=display:flex><span>boot<span style=color:#f92672>.</span>kernel<span style=color:#f92672>.</span>sysctl <span style=color:#960050;background-color:#1e0010>=</span> {
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;net.ipv4.conf.all.forwarding&#34;</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>;
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;net.ipv4.conf.default.forwarding&#34;</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>;
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></td></tr></table></div></div><p>network address translation (<a href=https://wiki.nftables.org/wiki-nftables/index.php/Performing_Network_Address_Translation_(NAT)>nat</a>) will allow you to route packets to different network.
+this is needed because, we want to route traffic from the wireguard network to the internet and back.</p><p>normaly nixos has an option for nat called <strong>&rsquo;networking.nat.enable&rsquo;</strong>.
+if this option is true, then every packet is forwarded on every interface.</p><p>this is a bad behavior because traffic is also routed to the internal network without checking the conntrack state first.
+this allows new connections to be established from the outside without a connection being initiated from the inside,
+which can lead to a significant security risk.</p><p>with the option <strong>&rsquo;networking.firewall.filterForward&rsquo;</strong> this behavoir can be changed and limited.
+this creates a <strong>&lsquo;forward&rsquo;</strong> and <strong>&lsquo;forward-allow&rsquo;</strong> nftable chain with different rules.
+but i dont use this option because i want my own table names and advanced config.</p><h3 id=nat---vpn>nat - vpn</h3><p>You may be embarrassed to read the news, use public hotspots or access content that is not available in your country while in a conservative vacation destination.
+what vpn providers usually offer.
+to route your own traffic via the router, wireguard offers an elegant solution in combination with nat on the router.</p><p>to route internal wireguard <strong>wg0</strong> packets to the interface <strong>eth0</strong> connected direct to the internet you need two tables: <strong>nat</strong> and <strong>forward</strong>.</p><p>in the nat table you define how your packets will be rewritten to be routed.
+in this case i have decided to use masquerading, a special form of source nat, where all packets source address will be translated to the ip address of the output interface <strong>eth0</strong>, the public ip address of my router.
+this processed in netfilters postrouting, before the packet leave the system.
+all nftable rules will be placed <strong>after</strong> the &lsquo;flush ruleset&rsquo; instruction</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span><span style=color:#75715e># the nat table will configure how packages are translated (srcnat, dstnat, aso)</span>
+</span></span><span style=display:flex><span>table ip nat <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  chain postrouting <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># this will add the source nat postrouting hook</span>
+</span></span><span style=display:flex><span>    type nat hook postrouting priority srcnat; policy accept;
+</span></span><span style=display:flex><span>    <span style=color:#75715e># input interface is the internal wireguard network &#39;wg0&#39;.</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># output interface is the outgoing interface &#39;eth0&#39;.</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># the source nat will be masquerade, only the ip address of your router will shown to the outside</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># all packets from wg0 will be translated/rewritten to the ip of the router</span>
+</span></span><span style=display:flex><span>    iifname <span style=color:#e6db74>&#34;wg0&#34;</span> oif <span style=color:#e6db74>&#34;eth0&#34;</span> masquerade comment <span style=color:#e6db74>&#34;from internal interfaces&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>now nftabls know how to translate the outgoing traffic but it needs more.
+you still have to define from which interface packets should be forwarded.</p><div class=speechbubble><div class=garry><img src=https://ripx80.de/images/garry-64.webp alt=garry></div><div class=chat><p><span class=whisper></span>
+dont do a default 'policy drop' on postrouting hook. internal redirects to loopback will fail. that is a very unfortunate state of affairs, trust me.</p></div></div><p>we want to forward all traffic from <strong>wg0</strong> to <strong>eth0</strong>. this will processed in forward hook.
+remember <strong>table ip</strong> only &lsquo;see&rsquo; ipv4 packets. if you want to forward ipv4 and ipv6 use inet instead.
+its a good practise to set default policy to <strong>drop</strong> on the <strong>forward</strong> chain, only defined forwarding accepted.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>table ip filter <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># need a forward chain to forward incomming packets</span>
+</span></span><span style=display:flex><span>  chain forward <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    type filter hook forward priority 0; policy drop;
+</span></span><span style=display:flex><span>    <span style=color:#75715e># only new connections from wg0 to eth0 are accepted and forwarded</span>
+</span></span><span style=display:flex><span>    iifname <span style=color:#e6db74>&#34;wg0&#34;</span> oif <span style=color:#e6db74>&#34;eth0&#34;</span> accept comment <span style=color:#e6db74>&#34;only from wg0 to internet&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># you need the reverse path for your packages, so only allow related and ethablished packts from the internet</span>
+</span></span><span style=display:flex><span>    iif <span style=color:#e6db74>&#34;eth0&#34;</span> oifname <span style=color:#e6db74>&#34;wg0&#34;</span> ct state related,established accept comment <span style=color:#e6db74>&#34;allow responses from internet&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>now nftables know which packets should be forwarded and how to translate/nat each packet.
+to use the forward like vpn provider, all traffic from the client must be passed through the router.
+a complete configuration of wireguard on the <strong>client 1</strong> side looks like this.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">17
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>wireguard <span style=color:#f92672>=</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  enable <span style=color:#f92672>=</span> true;
+</span></span><span style=display:flex><span>    interfaces <span style=color:#f92672>=</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>      wg0 <span style=color:#f92672>=</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        ips <span style=color:#f92672>=</span> <span style=color:#f92672>[</span> 192.168.1.2 <span style=color:#f92672>]</span>;
+</span></span><span style=display:flex><span>        privateKeyFile <span style=color:#f92672>=</span> /etc/wg/wg0;
+</span></span><span style=display:flex><span>        listenPort <span style=color:#f92672>=</span> 51820;
+</span></span><span style=display:flex><span>        peers <span style=color:#f92672>=</span> <span style=color:#f92672>[{</span>
+</span></span><span style=display:flex><span>          <span style=color:#75715e># vpn only mode, all traffic ipv4 and ipv6</span>
+</span></span><span style=display:flex><span>          allowedIPs <span style=color:#f92672>=</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;0.0.0.0/0&#34;</span> <span style=color:#e6db74>&#34;::/0&#34;</span> <span style=color:#f92672>]</span>;
+</span></span><span style=display:flex><span>          publicKey <span style=color:#f92672>=</span> UIUczSljVOqle8FnOO+mp9Dmdc49ojv7559T+KdTnnE<span style=color:#f92672>=</span>; <span style=color:#75715e># example key here</span>
+</span></span><span style=display:flex><span>          endpoint <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;80.1.1.1:3000&#34;</span>; <span style=color:#75715e># example public ip of the router</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}]</span>;
+</span></span><span style=display:flex><span>    mtu <span style=color:#f92672>=</span> 1380;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>;
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>;
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>;
+</span></span></code></pre></td></tr></table></div></div><p>maybe you have notice the <strong>mtu = 1380</strong> setting and you know that the default mtu size is normaly 1500 bytes.
+the reduced mtu is due to the overhead of wireguard but this is a separate story (comming soon).</p><h3 id=nat---vpn-restricted>nat - vpn restricted</h3><p>i have some power users who would drain the entire network bandwidth of my router if all their traffic went through my router.
+that&rsquo;s why i only want to grant this privilege to selected clients defined in my ruleset.
+for this setting the previous rule must be replaced if a list of allowed ip&rsquo;s in the forward chain.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">9
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span> table ip filter <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    chain forward <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        type filter hook forward priority 0; policy drop;
+</span></span><span style=display:flex><span>        <span style=color:#75715e># disable &#34;all&#34; forwarding rule</span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e># iifname &#34;wg0&#34; oif &#34;eth0&#34; accept comment &#34;only from wg0 to internet&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e># add source address to forward</span>
+</span></span><span style=display:flex><span>        ip saddr <span style=color:#f92672>{</span> 192.168.1.2, 192.168.1.3, 192.168.1.4 <span style=color:#f92672>}</span> oif <span style=color:#e6db74>&#34;eth0&#34;</span> accept comment <span style=color:#e6db74>&#34;only specified source ip to internet&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>only the defined wireguard endpoints are forwarded. if it is neseccary the <strong>wg0</strong> interface can be set also in this rule.</p><h3 id=wg---client-communication>wg - client communication</h3><p>my wireguard clients should be able to communicate with each other via the router.
+because all clients are in the same virtual network <strong>192.168.1.0/24</strong> they dont need any nat rule.
+only one forward rule is required to allow the communication.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">8
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>table ip filter <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    chain forward <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>      type filter hook forward priority 0; policy drop;
+</span></span><span style=display:flex><span>      <span style=color:#75715e># here the state will be set in a vmap as default</span>
+</span></span><span style=display:flex><span>      ct state vmap <span style=color:#f92672>{</span> invalid : drop, established : accept, related : accept <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>      iifname <span style=color:#e6db74>&#34;wg0&#34;</span> oifname <span style=color:#e6db74>&#34;wg0&#34;</span> accept comment <span style=color:#e6db74>&#34;allow client communication inside wg0&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>clients can now communicate which each other over the router. this is a very simple configuration and have no limits.
+the vmap on the beginning take care of the back route to response, etablished and related are accepted.
+but maybe you will restrict clients inside your wireguard network to talk to each other or to be explicit do the initial connection.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>table ip filter <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    chain forward <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>      type filter hook forward priority 0; policy drop;
+</span></span><span style=display:flex><span>      ct state vmap <span style=color:#f92672>{</span> invalid : drop, established : accept, related : accept <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>      iifname <span style=color:#e6db74>&#34;wg0&#34;</span> oifname <span style=color:#e6db74>&#34;wg0&#34;</span> jump wg-forward
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    chain wg-forward <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        ip saddr 192.168.1.2 ip daddr <span style=color:#f92672>{</span> 192.168.1.3, 192.168.1.4 <span style=color:#f92672>}</span> accept
+</span></span><span style=display:flex><span>        ip saddr 192.168.1.3 ip daddr <span style=color:#f92672>{</span> 192.168.1.2 <span style=color:#f92672>}</span> accept
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>for a better overview the <strong>wg-forward</strong> chain is added here and the jump statement is used instead of <strong>accept</strong>.</p><p>the ruleset will allow the ip address <strong>192.168.1.2</strong> etablish a new connection to ip addresses <strong>192.168.1.3</strong> and <strong>192.168.1.4</strong>.
+<strong>192.168.1.3</strong> can only etablish a new connection to <strong>192.168.1.3.4</strong>.</p><p>to finish the forwarding nat configuration here is a complete ruleset for vpn forwarding and wireguard internal client communication.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">20
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>table inet nat <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    chain postrouting <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        type nat hook postrouting priority srcnat; policy accept;
+</span></span><span style=display:flex><span>        iifname <span style=color:#e6db74>&#34;wg0&#34;</span> oif <span style=color:#e6db74>&#34;eth0&#34;</span> masquerade comment <span style=color:#e6db74>&#34;from internal interfaces&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>table inet vpn <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    chain forward <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        type filter hook forward priority 0; policy drop;
+</span></span><span style=display:flex><span>        ct state vmap <span style=color:#f92672>{</span> invalid : drop, established : accept, related : accept <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>        ip saddr <span style=color:#f92672>{</span> 192.168.1.2, 192.168.1.3, 192.168.1.4 <span style=color:#f92672>}</span> oif <span style=color:#e6db74>&#34;eth0&#34;</span> accept comment <span style=color:#e6db74>&#34;only specified source ip to internet&#34;</span>
+</span></span><span style=display:flex><span>        iifname <span style=color:#e6db74>&#34;wg0&#34;</span> oifname <span style=color:#e6db74>&#34;wg0&#34;</span> jump wg-forward
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    chain wg-forward <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        ip saddr 192.168.1.2 ip daddr <span style=color:#f92672>{</span> 192.168.1.3, 192.168.1.4 <span style=color:#f92672>}</span> accept
+</span></span><span style=display:flex><span>        ip saddr 192.168.1.3 ip daddr <span style=color:#f92672>{</span> 192.168.1.2 <span style=color:#f92672>}</span> accept
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=flowtables>flowtables</h2><p>for the sake of completeness, i would like to list flowtables here and show their basic use.</p><p><a href=https://wiki.nftables.org/wiki-nftables/index.php/Flowtables>flowtables</a> allow you to accelerate packet forwarding in software (and in hardware if your nic supports it) by using a conntrack-based network stack bypass.
+for example you can skip the default flow of rules and use the ingress flow and then redirect directly to the forward chain, too speed up your routing.</p><p>on nixos you should disable <code>nix networking.nftables.checkRuleset = false;</code> because the ruleset checker will not work with flowtables at the <a href=https://discourse.nixos.org/t/nftables-could-not-process-rule-no-such-file-or-directory/33031>moment</a>.
+remember: only stable interfaces can be used with the <strong>ingress hook</strong>.</p><p>in this example the flow will go from <strong>wg0</strong> to <strong>eth0</strong> direct from <strong>ingress</strong> to <strong>forward</strong> for tcp and upd traffic.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">15
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nix data-lang=nix><span style=display:flex><span>
+</span></span><span style=display:flex><span> table inet filter {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    flowtable ft {
+</span></span><span style=display:flex><span>        hook ingress priority <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>        devices <span style=color:#f92672>=</span> { wg0<span style=color:#f92672>,</span> eth0 }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    chain forward {
+</span></span><span style=display:flex><span>        type filter hook forward priority <span style=color:#ae81ff>0</span>; policy drop;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e># enable flow offloading for better throughput</span>
+</span></span><span style=display:flex><span>        ip protocol { tcp<span style=color:#f92672>,</span> udp } ct state established flow offload <span style=color:#f92672>@</span>ft counter
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></td></tr></table></div></div><p>note that when you use flowtables the hooks prerouting and postrouting are bypassed. you canot use a feature like masquerade with this fastpath.
+a deep explaination of this topic you can find on this <a href="https://thermalcircle.de/doku.php?id=blog:linux:flowtables_1_a_netfilter_nftables_fastpath">blog</a> post.</p><h2 id=complete-ruleset>complete ruleset</h2><p>this is a blueprint for a minimal wg router to enable routing between wireguard nodes (internal wg0) communication and the internet via nat (vpn mode).
+i use <a href="https://wiki.nftables.org/wiki-nftables/index.php/Scripting#:~:text=%22/etc/nftables/*%22-,Defining%20variables,-You%20can%20use">define</a> to set variables at the beginning for a clean and structured ruleset.</p><p>here are some additional features included from the prevoius sections:</p><ul><li>flush ruleset</li><li>nftables scripting</li><li>named counters</li><li>named limits</li><li>limit max ssh connections from src_ip</li><li>limits max conections in time</li><li>reverse path filtering (default from nixos)</li><li>blocking list (fail2ban replacement)</li><li>log ssh connection to kernel log</li><li>source nat and masquerading (vpn)</li><li>forward specific wireguard clients to each other</li><li>ingress filter to drop bad packages like XMAS, SYN Flood, aso</li></ul><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">  1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">  2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">  3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">  4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">  5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">  6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">  7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">  8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">  9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 24
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 25
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 26
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 27
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 28
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 29
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 30
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 31
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 32
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 33
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 34
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 35
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 36
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 37
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 38
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 39
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 40
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 41
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 42
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 43
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 44
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 45
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 46
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 47
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 48
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 49
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 50
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 51
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 52
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 53
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 54
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 55
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 56
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 57
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 58
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 59
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 60
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 61
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 62
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 63
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 64
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 65
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 66
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 67
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 68
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 69
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 70
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 71
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 72
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 73
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 74
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 75
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 76
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 77
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 78
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 79
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 80
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 81
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 82
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 83
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 84
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 85
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 86
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 87
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 88
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 89
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 90
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 91
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 92
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 93
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 94
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 95
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 96
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 97
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 98
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 99
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">100
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">101
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">102
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">103
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">104
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">105
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">106
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">107
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">108
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">109
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">110
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">111
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">112
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">113
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">114
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">115
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">116
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">117
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">118
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">119
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">120
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">121
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">122
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">123
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">124
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">125
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>firewall.enable <span style=color:#f92672>=</span> true;
+</span></span><span style=display:flex><span>nftables <span style=color:#f92672>=</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    enable <span style=color:#f92672>=</span> true;
+</span></span><span style=display:flex><span>    checkRuleset <span style=color:#f92672>=</span> false;
+</span></span><span style=display:flex><span>    ruleset <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;&#39;</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># delete all prev rules like nixos default rules</span>
+</span></span><span style=display:flex><span>    flush ruleset
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    define if_in <span style=color:#f92672>=</span> wg0              <span style=color:#75715e># 192.168.1.1/24</span>
+</span></span><span style=display:flex><span>    define if_out <span style=color:#f92672>=</span> eth0            <span style=color:#75715e># 80.1.1.1/24</span>
+</span></span><span style=display:flex><span>    define if_wg  <span style=color:#f92672>=</span> <span style=color:#f92672>{</span> $if_out <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    define wg_port <span style=color:#f92672>=</span> <span style=color:#ae81ff>3000</span>
+</span></span><span style=display:flex><span>    define ssh <span style=color:#f92672>=</span> <span style=color:#f92672>{</span> $if_in <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>    define dns <span style=color:#f92672>=</span> <span style=color:#f92672>{</span> $if_in <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    define client1 <span style=color:#f92672>=</span> 192.168.1.2
+</span></span><span style=display:flex><span>    define client2  <span style=color:#f92672>=</span> 192.168.1.3
+</span></span><span style=display:flex><span>    define client3  <span style=color:#f92672>=</span> 192.168.1.4
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># here i define the internal network with hosts to talk to each other</span>
+</span></span><span style=display:flex><span>    define wg_internal <span style=color:#f92672>=</span> <span style=color:#f92672>{</span> $client1, $client2, $client3 <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># here i define the hosts they can use this server as a vpn router to forward packages to the internet.</span>
+</span></span><span style=display:flex><span>    define vpn_allow <span style=color:#f92672>=</span> <span style=color:#f92672>{</span> $client1, $client2 <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    table inet fw <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        counter cnt_ssh <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            comment <span style=color:#e6db74>&#34;count ssh packets&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        counter cnt_dns <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            comment <span style=color:#e6db74>&#34;count dns packets&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        counter cnt_dns_tcp <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            comment <span style=color:#e6db74>&#34;count dns over tcp packets&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        limit lim_ssh <span style=color:#f92672>{</span> rate over 10/minute <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>        limit lim_icmp <span style=color:#f92672>{</span> rate 10/second ; comment <span style=color:#e6db74>&#34;no ping floods&#34;</span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>        limit lim_dns <span style=color:#f92672>{</span> rate 150/second ; comment <span style=color:#e6db74>&#34;no dns floods&#34;</span> <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        set deny_v4 <span style=color:#f92672>{</span> type ipv4_addr ; flags dynamic, timeout ; timeout 5m ; comment <span style=color:#e6db74>&#34;deny list of blocked ip addresses&#34;</span>;<span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        chain rpfilter <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            type filter hook prerouting priority mangle + 10; policy drop;
+</span></span><span style=display:flex><span>            fib saddr . mark . iif oif exists accept comment <span style=color:#e6db74>&#34;reverse path check&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        chain input <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            type filter hook input priority 0; policy drop;
+</span></span><span style=display:flex><span>            <span style=color:#75715e># iif is save here, because lo is a stable interface and trusted</span>
+</span></span><span style=display:flex><span>            iif lo accept comment <span style=color:#e6db74>&#34;trusted interfaces&#34;</span>
+</span></span><span style=display:flex><span>            ip saddr @deny_v4 drop comment <span style=color:#e6db74>&#34;drop all clients from blocking list&#34;</span>
+</span></span><span style=display:flex><span>            icmp type echo-request limit name lim_icmp counter accept comment <span style=color:#e6db74>&#34;No ping floods and allow pings&#34;</span>
+</span></span><span style=display:flex><span>            ct state vmap <span style=color:#f92672>{</span> invalid : drop, established : accept, related : accept, new : jump services, untracked : jump services <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        chain output <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            type filter hook output priority 0; policy drop;
+</span></span><span style=display:flex><span>            ct state vmap <span style=color:#f92672>{</span> invalid : drop, established : accept, related : accept, new : accept, untracked : accept <span style=color:#f92672>}</span> comment <span style=color:#e6db74>&#34;allow outgoing packages&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        chain services <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e># iif is save here because eth0 is a physical interface created at boot</span>
+</span></span><span style=display:flex><span>            iif $if_wg udp dport $wg_port accept comment <span style=color:#e6db74>&#34;open wg port&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e># iifname is needed becaue wg0 is a dynamic interface</span>
+</span></span><span style=display:flex><span>            iifname $ssh tcp dport <span style=color:#ae81ff>22</span> ct state new, untracked limit name lim_ssh update @deny_v4 <span style=color:#f92672>{</span> ip saddr <span style=color:#f92672>}</span> comment <span style=color:#e6db74>&#34;limit ssh connection in time to blocking list&#34;</span>
+</span></span><span style=display:flex><span>            iifname $ssh tcp dport <span style=color:#ae81ff>22</span> meter ssh_meter <span style=color:#f92672>{</span> ip saddr ct count over <span style=color:#ae81ff>5</span> <span style=color:#f92672>}</span> counter drop comment <span style=color:#e6db74>&#34;limit ssh max connections per ip&#34;</span>
+</span></span><span style=display:flex><span>            iifname $ssh tcp dport <span style=color:#ae81ff>22</span> ct state new counter name cnt_ssh log prefix <span style=color:#e6db74>&#34;[nftables] new ssh connection: &#34;</span> accept comment <span style=color:#e6db74>&#34;allow, log, count new ssh connections&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            iifname $dns udp dport <span style=color:#ae81ff>53</span> limit name lim_dns counter name cnt_dns accept comment <span style=color:#e6db74>&#34;limit dns queries on interface&#34;</span>
+</span></span><span style=display:flex><span>            iifname $dns tcp dport <span style=color:#ae81ff>53</span> limit name lim_dns counter name cnt_dns_tcp accept comment <span style=color:#e6db74>&#34;limit dns queries on interface&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    table inet nat <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        chain postrouting <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e># dont do a policy drop; here, internal redirects to loopback will fail</span>
+</span></span><span style=display:flex><span>            type nat hook postrouting priority 100; policy accept;
+</span></span><span style=display:flex><span>            <span style=color:#75715e># mix iifname for wg0 and oif for eth0</span>
+</span></span><span style=display:flex><span>            iifname $if_in oif $if_out masquerade comment <span style=color:#e6db74>&#34;from internal interfaces&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    table inet vpn <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        chain forward <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            type filter hook forward priority 0; policy drop;
+</span></span><span style=display:flex><span>            ct state vmap <span style=color:#f92672>{</span> invalid : drop, established : accept, related : accept <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            ip saddr $vpn_allow oif $if_out accept comment <span style=color:#e6db74>&#34;only specified source ip to internet&#34;</span>
+</span></span><span style=display:flex><span>            iif $if_out oifname $if_in ct state related,established accept comment <span style=color:#e6db74>&#34;allow responses from internet&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            iifname $if_in oifname $if_in jump wg-forward comment <span style=color:#e6db74>&#34;allow internal routing&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        chain wg-forward <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            ip saddr $client1 ip daddr $wg_internal accept
+</span></span><span style=display:flex><span>            ip saddr $client2 ip daddr $wg_internal accept
+</span></span><span style=display:flex><span>            ip saddr $client3 ip daddr <span style=color:#f92672>{</span> $client2 <span style=color:#f92672>}</span> accept
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    table netdev filter <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        chain ingress <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e># can be a problem here to add wg0. do this in a extra systemd oneshot ruleset for dynamic interfaces</span>
+</span></span><span style=display:flex><span>            type filter hook ingress devices <span style=color:#f92672>=</span> <span style=color:#f92672>{</span> $if_out <span style=color:#f92672>}</span> priority -500
+</span></span><span style=display:flex><span>            jump ingress_filter
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e># Basic filter chain, devices can be configued to jump here</span>
+</span></span><span style=display:flex><span>        chain ingress_filter <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>            ip frag-off &amp; 0x1fff !<span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span> counter drop comment <span style=color:#e6db74>&#34;drop all fragments&#34;</span>
+</span></span><span style=display:flex><span>            tcp flags fin,psh,urg / fin,psh,urg counter packets <span style=color:#ae81ff>0</span> bytes <span style=color:#ae81ff>0</span> drop comment <span style=color:#e6db74>&#34;drop xmas nmap packets&#34;</span>
+</span></span><span style=display:flex><span>            tcp flags &amp; <span style=color:#f92672>(</span>fin|syn|rst|psh|ack|urg<span style=color:#f92672>)</span> <span style=color:#f92672>==</span> fin|syn|rst|psh|ack|urg counter drop comment <span style=color:#e6db74>&#34;drop xmas packets&#34;</span>
+</span></span><span style=display:flex><span>            tcp flags &amp; <span style=color:#f92672>(</span>fin|syn|rst|psh|ack|urg<span style=color:#f92672>)</span> <span style=color:#f92672>==</span> 0x0 counter drop comment <span style=color:#e6db74>&#34;drop null packets&#34;</span>
+</span></span><span style=display:flex><span>            tcp flags syn tcp option maxseg size 1-535 counter drop comment <span style=color:#e6db74>&#34;drop uncommon mss values&#34;</span>
+</span></span><span style=display:flex><span>            tcp flags &amp; <span style=color:#f92672>(</span>fin|syn<span style=color:#f92672>)</span> <span style=color:#f92672>==</span> <span style=color:#f92672>(</span>fin|syn<span style=color:#f92672>)</span> counter drop comment <span style=color:#e6db74>&#34;drop fin and syn at the same time&#34;</span>
+</span></span><span style=display:flex><span>            tcp flags &amp; <span style=color:#f92672>(</span>syn|rst<span style=color:#f92672>)</span> <span style=color:#f92672>==</span> <span style=color:#f92672>(</span>syn|rst<span style=color:#f92672>)</span> counter drop comment <span style=color:#e6db74>&#34;drop rst and syn at the same time&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>&#39;&#39;</span>;
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>;
+</span></span></code></pre></td></tr></table></div></div><h2 id=testing-ruleset>testing ruleset</h2><p>here are some tests to see if the ruleset work.
+these are not complete or described in detail.
+they are for practice purposes only and do not replace further tests.</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">6
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>ping -t 192.168.1.1 -l <span style=color:#ae81ff>65500</span> <span style=color:#75715e># ping flood</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dog -U -n 192.168.1.1 google.de <span style=color:#75715e># test udp dns query</span>
+</span></span><span style=display:flex><span>dog -T -n 192.168.1.1 google.de <span style=color:#75715e># test tcp dns query</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>ssh 192.168.1.1 <span style=color:#75715e># ssh counter and log entry</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">16
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>nft list counters
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>table inet fw <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    counter cnt_ssh <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        comment <span style=color:#e6db74>&#34;count ssh packets&#34;</span>
+</span></span><span style=display:flex><span>        packets <span style=color:#ae81ff>1</span> bytes <span style=color:#ae81ff>60</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>    counter cnt_dns <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        comment <span style=color:#e6db74>&#34;count dns packets&#34;</span>
+</span></span><span style=display:flex><span>        packets <span style=color:#ae81ff>1</span> bytes <span style=color:#ae81ff>66</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>    counter cnt_dns_tcp <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        comment <span style=color:#e6db74>&#34;count dns over tcp packets&#34;</span>
+</span></span><span style=display:flex><span>        packets <span style=color:#ae81ff>1</span> bytes <span style=color:#ae81ff>60</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>check for ssh log</p><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>journalctl -k --priority<span style=color:#f92672>=</span><span style=color:#ae81ff>4</span> | tail
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>nmap -sN 192.168.1.1 -p22 <span style=color:#75715e># counter increase by two null packets</span>
+</span></span><span style=display:flex><span>nmap -sF 192.168.1.1 -p22 <span style=color:#75715e># not in counter</span>
+</span></span><span style=display:flex><span>nmap -sX 192.168.1.1 -p22 <span style=color:#75715e># counter increase by two xmas</span>
+</span></span><span style=display:flex><span>nmap -sS --scanflags SYNFIN 192.168.1.1 -p22 <span style=color:#75715e># URG, ACK, PSH, RST, SYN, and FIN</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=docs>docs</h2><ul><li><a href=https://ripx80.de/posts/04-nftables/>basic nftables introduction</a></li><li><a href=https://serverfault.com/questions/985158/what-is-the-difference-between-iifname-and-iif-in-nftables>difference</a> between iif and iifname</li><li><a href=https://discourse.nixos.org/t/nftables-could-not-process-rule-no-such-file-or-directory/33031>flowtables on nixos</a></li><li><a href="https://thermalcircle.de/doku.php?id=blog:linux:flowtables_1_a_netfilter_nftables_fastpath">flowtable explaination</a> article</li><li><a href=https://wiki.nftables.org/wiki-nftables/index.php/Scripting>nftables scripting</a></li></ul><h2 id=learned>learned</h2><ul><li>masquerade: Masquerade is a special case of SNAT, where the source address is automagically set to the address of the output interface.</li><li>redirect: By using redirect, packets will be forwarded to local machine. Is a special case of DNAT where the destination is the current machine.</li><li>${pkgs.iproute}/bin/ip link set mtu 1380 dev wg0 # set the mtu of wg0 interface to 1380</li><li>journalctl -f read on the fly, journalctl -k only kernel messages like nftables, journal -k &ndash;priority=4 (show priority level 4 like nftables)</li><li>tcpdump -i eth0 host 38.10.10.1 and not port 58432</li><li>if you have a table this rules will added or change the ruleset like the default policy of a chain.</li></ul></div></article><div id=footer-post-container><div id=footer-post><div id=nav-footer style=display:none><ul><li><a href=/>home</a></li><li><a href=/posts>writings</a></li><li><a href=/lib>lib</a></li><li><a href=/tags>tags</a></li><li><a href=/whoami>whoami</a></li></ul></div><div id=share-footer style=display:none><ul><li><a class=icon href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f" aria-label=Facebook><i class="fab fa-facebook fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="https://twitter.com/share?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&text=nftables%20-%20advacned%20router" aria-label=Twitter><i class="fab fa-twitter fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&title=nftables%20-%20advacned%20router" aria-label=Linkedin><i class="fab fa-linkedin fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&is_video=false&description=nftables%20-%20advacned%20router" aria-label=Pinterest><i class="fab fa-pinterest fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="mailto:?subject=nftables%20-%20advacned%20router&body=Check out this article: https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f" aria-label=Email><i class="fas fa-envelope fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="https://getpocket.com/save?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&title=nftables%20-%20advacned%20router" aria-label=Pocket><i class="fab fa-get-pocket fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="http://reddit.com/submit?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&title=nftables%20-%20advacned%20router" aria-label=reddit><i class="fab fa-reddit fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="http://www.tumblr.com/share/link?url=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&name=nftables%20-%20advacned%20router&description=configure%20a%20nixos%20system%20as%20a%20router%20based%20on%20nftables" aria-label=Tumblr><i class="fab fa-tumblr fa-lg" aria-hidden=true></i></a></li><li><a class=icon href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fripx80.de%2fposts%2f05-nftables-router%2f&t=nftables%20-%20advacned%20router" aria-label="Hacker News"><i class="fab fa-hacker-news fa-lg" aria-hidden=true></i></a></li></ul></div><div id=actions-footer><a id=menu-toggle class=icon href=# onclick='return $("#nav-footer").toggle(),!1' aria-label=Menu><i class="fas fa-bars fa-lg" aria-hidden=true></i> Menu</a>
+<a id=share-toggle class=icon href=# onclick='return $("#share-footer").toggle(),!1' aria-label=Share><i class="fas fa-share-alt fa-lg" aria-hidden=true></i> share</a>
+<a id=top style=display:none class=icon href=# onclick='$("html, body").animate({scrollTop:0},"fast")' aria-label="Top of Page"><i class="fas fa-chevron-up fa-lg" aria-hidden=true></i> Top</a></div></div></div><footer id=footer><div class=footer-left>Copyright &copy; ripx80</div><div class=footer-right><nav><ul><li><a href=/>home</a></li><li><a href=/posts>writings</a></li><li><a href=/lib>lib</a></li><li><a href=/tags>tags</a></li><li><a href=/whoami>whoami</a></li><li><a href=https://ripx80.de/legal>legal notice</a></li><li><a href=https://ripx80.de/privacy>pricacy policy</a></li></ul></nav></div></footer><div id=cookies>if you use this site you accept the usage of cookies. take a closer look under <a href=https://ripx80.de/privacy>privacy policy</a>
+<button id=cookies-btn>accept</button></div><script src=https://ripx80.de/js/custom.js defer></script></div></body><link rel=stylesheet href=/lib/font-awesome/css/all.min.css><script src=/lib/jquery/jquery.min.js></script><script src=/js/main.js></script><script src=/js/code-copy.js></script></html>
