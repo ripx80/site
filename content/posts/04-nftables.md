@@ -397,7 +397,7 @@ in this exanple the file '/nix/store/ngdbcld1pdh1h8zpn1541c35zv25q6r2-nftables-r
 now i have the basics that i need to setup a simple packet filter on my nixos hosts and debug the current rule set.
 i can only recommend looking into the sources given to familiarize yourself with the whole topic.
 
-time to get hands dirty for the real project of this journey: the nixos wireguard router with vpn support (comming soon).
+time to get hands dirty for the real project of this journey: the nixos wireguard [nftables-router](https://ripx80.de/posts/04-nftables/) with vpn support.
 
 ## docs
 

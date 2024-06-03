@@ -4,26 +4,26 @@ title: "nftables - advacned router"
 linktitle: "nftables router"
 description: "configure a nixos system as a router based on nftables"
 date: 2024-05-31
-draft: true
+draft: false
 tags:
   - network
   - security
+  - nftables
   - nix
 keywords:
   - network
   - security
+  - nftables
   - nix
 weight: 0
 ---
-
-- (todo): should i use fake ip's instead of meta.ip to reduce overload?
 
 ## short
 
 this post deals with some advanced rules and configurations to build router based on the previous post about [nftables - basics](https://ripx80.de/posts/04-nftables/).
 the focus is in general on nftables but the whole thing is build on a nixos system.
 
-if you need additional ideas or use cases? take a look at (50 things to do with nftables, comming soon) post.
+if you need additional ideas or use cases? take a look at the blog (comming soon) post.
 
 - system: x86_64
 - kernel: 6.7.9
@@ -42,14 +42,24 @@ nixos modules:
 
 ```sh
 nft flush ruleset # clear, flush the entire ruleset
+nft list counters # list named counters
+
+# nft syntax for the logging statement
+nft add rule inet fw services iifname wg0 tcp dport 22 ct state new log prefix \"[nftables] new ssh accepted: \" accept comment "allow and log ssh"
 ```
 
-## general struct
+## network struct
 
-the general struct of the network is a central router in the internet, reachable over its public ip.
+the general struct of the network is a central router in the internet, reachable over its public ip (example here: 80.1.1.1).
 clients will connect via open wireguard **port 3000** on **eth0** to internal network **wg0** (192.168.1.0/24).
 they can communicate with each other via the router and has no direct communication over a mesh network.
 the traffic are routed via nat masquerade to the outsite like a vpn provider does.
+
+- wg0:      192.168.1.0/24
+- router:   192.168.1.1/32
+- client 1: 192.168.1.2/32
+- client 2: 192.168.1.3/32
+- client 3: 192.168.1.4/32
 
 ## iif and iifname
 
@@ -57,15 +67,49 @@ before we start with nft rulesets and features we must understand the difference
 for me it was not clear at the beginning what exactly is the difference so i used only iif because i had read its faster.
 after some time i run into a problem when i update my system and the service nftables and wireguard-wg0 updated and restarted.
 
-nftables could not be restart successful because wg0 was not there. because of this i canot log into my server anymore because the ssh unreacable but after a restart of the server i can **fortunately** login again.
-after some debug sessions i learnd the [difference](https://serverfault.com/questions/985158/what-is-the-difference-between-iifname-and-iif-in-nftables) and the problem with non-static ethernet interfaces.
+nftables could not be restart successful because wg0 was not available to this time.
+because of this i canot log into my server anymore. the ssh service was unreacable but after a restart of the server i can **fortunately** login again.
+after some deep dive sessions i learnd the [difference](https://serverfault.com/questions/985158/what-is-the-difference-between-iifname-and-iif-in-nftables) and the problem with non-static ethernet interfaces.
 
-todo: if wg0 is not present when ingress chain starts it will fail. normaly you can use iifame to lookup but in ingress this is not possible. it must be present when the rule applies. maybe seperate ingress to a systemd service which starts after the normal firwall and use iifname for wg0 interfaces
-(todo): why is iif faster than ifname? explain
+**iif** looks up and compares the interface index of a packet. so it uses less resources because it's a integer in the [packet](https://github.com/torvalds/linux/blob/v4.19/include/linux/skbuff.h#L628) when it pass the network stack.
+so no lookup or string comparsion is needed only a comparsion of the number.
+The problem is, when a interface is deleted, recreated with a new index number or it's not available at the time when nftables parse the ruleset the index is not available or not match.
+index values are not reassigned again for a new created interface. it will be only increased, so the index will not match any packet anymore.
 
-- iif: must be present, index number, not at runtime, lo and all phx interfaces
-- iifname: must not be present, string lookup for index, at runtime, all dynamical interfaces like wg0
-- for advanced stuff, dont use the nixos module: different systemd oneshots, combine together when restart/flush
+a good example when **iif** should be used is the loopback (lo) interface.
+the index of this interface is garanteed, its always the first interface with normaly the index number **1**. It can not be deleted or added a second time.
+this can be verified with
+
+```sh
+ip address show lo
+
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+```
+
+the first number on the left is the index number of the interface **lo**.
+
+**iifname** on the other side does a string comparsion with the interface name to lookup the index at runtime.
+this need more resources but you can create a rule for a non-existing interface or not existing at the moment nftables parse the rules.
+additionaly **iifname** can match wildcards like **wg***, for all wireguard interfaces beginning with **wg**.
+
+**what is recommended to use?**
+
+- **iif** should be used for stable interfaces that won't change once created like physical interfaces or the loopback interface. this interface must be guaraneed at boot and when the ruleset is parsed.
+- **iifname** should be used for dynamic interfaces not known at boot, not created at ruleset parsing or for wildcard matches.
+
+to address the problem described above the wireguard interface wg0 was not available when nftables was restarted and parsed the ruleset where iif was defined for wg0.
+after change to iifname on dynamic interfaces i can build the configuration on a remote system and it can be lookup indexes on runtime.
+
+one expection is the [**ingress** hook](https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks) of nftables. here only iif statements are accepted. so only stable interfaces can be defined or it must be safe to define a dynamic interface like wg0.
+it must be enshured that the dynamic interface is present when the ingress rules are applied. you can do that with a second nftables systemd service that is start after the wg0 interface is created.
+
+for advanced stuff or using ingress for dynamic interfaces, dont use the nixos module.
+define different systemd oneshots and combine them together when they start/stop/restart/flush.
+
+## nftables struct
 
 i think it's always good to know exactly who sets which rules when and to find them in one place in my config.
 because of that, when i have a more advanced ruleset i overwrite all default nixos rules with a **networking.nftables.ruleSet** and flush all previous rules with **flush ruleset**.
@@ -300,21 +344,21 @@ table ip filter {
 
 now nftables know which packets should be forwarded and how to translate/nat each packet.
 to use the forward like vpn provider, all traffic from the client must be passed through the router.
-a complete configuration of wireguard on the client side looks like this.
+a complete configuration of wireguard on the **client 1** side looks like this.
 
 ```sh
 wireguard = {
   enable = true;
     interfaces = {
       wg0 = {
-        ips = [ meta.${config.networking.hostName}.wg.ip ];
-        privateKeyFile = config.age.secrets."wg0".path;
+        ips = [ 192.168.1.2 ];
+        privateKeyFile = /etc/wg/wg0;
         listenPort = 51820;
         peers = [{
           # vpn only mode, all traffic ipv4 and ipv6
           allowedIPs = [ "0.0.0.0/0" "::/0" ];
-          publicKey = meta.wgnc.wg.pub_key;
-          endpoint = "${meta.wgnc.ip}:${toString (meta.wgnc.wg.port)}";
+          publicKey = UIUczSljVOqle8FnOO+mp9Dmdc49ojv7559T+KdTnnE=; # example key here
+          endpoint = "80.1.1.1:3000"; # example public ip of the router
         }];
     mtu = 1380;
     };
@@ -324,8 +368,6 @@ wireguard = {
 
 maybe you have notice the **mtu = 1380** setting and you know that the default mtu size is normaly 1500 bytes.
 the reduced mtu is due to the overhead of wireguard but this is a separate story (comming soon).
-remember i use a git-crypt encrypted meta.nix file for ip addresses and other confidential stuff so you must replace
-the meta values with your ip addresses and public wg key.
 
 ### nat - vpn restricted
 
@@ -340,7 +382,7 @@ for this setting the previous rule must be replaced if a list of allowed ip's in
         # disable "all" forwarding rule
         # iifname "wg0" oif "eth0" accept comment "only from wg0 to internet"
         # add source address to forward
-        ip saddr { 192.168.1.2, 192.168.1.10, 192.168.1.43 } oif "eth0" accept comment "only specified source ip to internet"
+        ip saddr { 192.168.1.2, 192.168.1.3, 192.168.1.4 } oif "eth0" accept comment "only specified source ip to internet"
     }
  }
 ```
@@ -377,7 +419,7 @@ table ip filter {
     }
 
     chain wg-forward {
-        ip saddr 192.168.1.2 ip daddr { 192.168.1.3, 192.168.1.43 } accept
+        ip saddr 192.168.1.2 ip daddr { 192.168.1.3, 192.168.1.4 } accept
         ip saddr 192.168.1.3 ip daddr { 192.168.1.2 } accept
     }
 }
@@ -385,8 +427,8 @@ table ip filter {
 
 for a better overview the **wg-forward** chain is added here and the jump statement is used instead of **accept**.
 
-the ruleset will allow the ip address **192.168.1.2** etablish a new connection to ip addresses **192.168.1.3** and **192.168.1.43**.
-**192.168.1.3** can only etablish a new connection to **192.168.1.3.43**.
+the ruleset will allow the ip address **192.168.1.2** etablish a new connection to ip addresses **192.168.1.3** and **192.168.1.4**.
+**192.168.1.3** can only etablish a new connection to **192.168.1.3.4**.
 
 to finish the forwarding nat configuration here is a complete ruleset for vpn forwarding and wireguard internal client communication.
 
@@ -402,12 +444,12 @@ table inet vpn {
     chain forward {
         type filter hook forward priority 0; policy drop;
         ct state vmap { invalid : drop, established : accept, related : accept }
-        ip saddr { 192.168.1.2, 192.168.1.10, 192.168.1.43 } oif "eth0" accept comment "only specified source ip to internet"
+        ip saddr { 192.168.1.2, 192.168.1.3, 192.168.1.4 } oif "eth0" accept comment "only specified source ip to internet"
         iifname "wg0" oifname "wg0" jump wg-forward
     }
 
     chain wg-forward {
-        ip saddr 192.168.1.2 ip daddr { 192.168.1.3, 192.168.1.43 } accept
+        ip saddr 192.168.1.2 ip daddr { 192.168.1.3, 192.168.1.4 } accept
         ip saddr 192.168.1.3 ip daddr { 192.168.1.2 } accept
     }
 }
@@ -420,7 +462,8 @@ for the sake of completeness, i would like to list flowtables here and show thei
 [flowtables](https://wiki.nftables.org/wiki-nftables/index.php/Flowtables) allow you to accelerate packet forwarding in software (and in hardware if your nic supports it) by using a conntrack-based network stack bypass.
 for example you can skip the default flow of rules and use the ingress flow and then redirect directly to the forward chain, too speed up your routing.
 
-on nixos you must disable ```nix networking.nftables.checkRuleset = false;``` because the ruleset checker will not work with flowtables at the [moment](https://discourse.nixos.org/t/nftables-could-not-process-rule-no-such-file-or-directory/33031).
+on nixos you should disable ```nix networking.nftables.checkRuleset = false;``` because the ruleset checker will not work with flowtables at the [moment](https://discourse.nixos.org/t/nftables-could-not-process-rule-no-such-file-or-directory/33031).
+remember: only stable interfaces can be used with the **ingress hook**.
 
 in this example the flow will go from **wg0** to **eth0** direct from **ingress** to **forward** for tcp and upd traffic.
 
@@ -449,7 +492,6 @@ a deep explaination of this topic you can find on this [blog](https://thermalcir
 
 this is a blueprint for a minimal wg router to enable routing between wireguard nodes (internal wg0) communication and the internet via nat (vpn mode).
 i use [define](https://wiki.nftables.org/wiki-nftables/index.php/Scripting#:~:text=%22/etc/nftables/*%22-,Defining%20variables,-You%20can%20use) to set variables at the beginning for a clean and structured ruleset.
-if you see ```nix ${meta.ripbox.wg.ip}``` this means that i define the ip and other host related information in one [git-crypt](https://github.com/AGWA/git-crypt) meta.nix file in my repository.
 
 here are some additional features included from the prevoius sections:
 
@@ -466,134 +508,140 @@ here are some additional features included from the prevoius sections:
 - forward specific wireguard clients to each other
 - ingress filter to drop bad packages like XMAS, SYN Flood, aso
 
-## todo: use the new if layout from wgpx
-
 ```sh
 firewall.enable = true;
-    nftables = {
-      enable = true;
-      checkRuleset = false;
-      ruleset = ''
-        # delete all prev rules like nixos default rules
-        flush ruleset
+nftables = {
+    enable = true;
+    checkRuleset = false;
+    ruleset = ''
+    # delete all prev rules like nixos default rules
+    flush ruleset
 
-        define if_in = wg0
-        define if_out = eth0
-        define if_wg  = { $if_out }
+    define if_in = wg0              # 192.168.1.1/24
+    define if_out = eth0            # 80.1.1.1/24
+    define if_wg  = { $if_out }
 
-        define wg_port = ${builtins.toString meta.${config.networking.hostName}.wg.port}
-        define ssh = { $if_in }
-        define dns = { $if_in }
+    define wg_port = 3000
+    define ssh = { $if_in }
+    define dns = { $if_in }
 
-        define ripbox = ${meta.ripbox.wg.ip}
-        define ripmc  = ${meta.ripmc.wg.ip}
-        define ripwin = ${meta.ripwin.wg.ip}
+    define client1 = 192.168.1.2
+    define client2  = 192.168.1.3
+    define client3  = 192.168.1.4
 
-        # here i define the internal network with hosts to talk to each other
-        define frostnet = { $ripbox, $ripmc, $ripwin }
-        # here i define the hosts they can use this server as a vpn router to forward packages to the internet.
-        define vpn_allow = { $ripbox, $ripmc, $ripmob }
+    # here i define the internal network with hosts to talk to each other
+    define wg_internal = { $client1, $client2, $client3 }
+    # here i define the hosts they can use this server as a vpn router to forward packages to the internet.
+    define vpn_allow = { $client1, $client2 }
 
-        table inet fw {
+    table inet fw {
 
-            counter cnt_ssh {
-                comment "count ssh packets"
-            }
-
-            counter cnt_dns {
-                comment "count dns packets"
-            }
-
-            counter cnt_dns_tcp {
-                comment "count dns over tcp packets"
-            }
-
-            limit lim_ssh { rate over 10/minute }
-            limit lim_icmp { rate 10/second ; comment "no ping floods"}
-            limit lim_dns { rate 150/second ; comment "no dns floods" }
-
-            set deny_v4 { type ipv4_addr ; flags dynamic, timeout ; timeout 5m ; comment "deny list of blocked ip addresses";}
-
-            chain rpfilter {
-                type filter hook prerouting priority mangle + 10; policy drop;
-                fib saddr . mark . iif oif exists accept comment "reverse path check"
-            }
-
-            chain input {
-                type filter hook input priority 0; policy drop;
-                iif lo accept comment "trusted interfaces"
-                ip saddr @deny_v4 drop comment "drop all clients from blocking list"
-                icmp type echo-request limit name lim_icmp counter accept comment "No ping floods and allow pings"
-                ct state vmap { invalid : drop, established : accept, related : accept, new : jump services, untracked : jump services }
-            }
-
-            chain output {
-                type filter hook output priority 0; policy drop;
-                ct state vmap { invalid : drop, established : accept, related : accept, new : accept, untracked : accept } comment "allow outgoing packages"
-            }
-
-            chain services {
-                iif $if_wg udp dport $wg_port accept comment "open wg port"
-
-                iifname $ssh tcp dport 22 ct state new, untracked limit name lim_ssh update @deny_v4 { ip saddr } comment "limit ssh connection in time to blocking list"
-                iifname $ssh tcp dport 22 meter ssh_meter { ip saddr ct count over 5 } counter drop comment "limit ssh max connections per ip"
-                iifname $ssh tcp dport 22 ct state new counter name cnt_ssh log prefix "[nftables] new ssh connection: " accept comment "allow, log, count new ssh connections"
-
-                iifname $dns udp dport 53 limit name lim_dns counter name cnt_dns accept comment "limit dns queries on interface"
-                iifname $dns tcp dport 53 limit name lim_dns counter name cnt_dns_tcp accept comment "limit dns queries on interface"
-            }
+        counter cnt_ssh {
+            comment "count ssh packets"
         }
 
-        table inet nat {
-            chain postrouting {
-                type nat hook postrouting priority srcnat; policy accept;
-                iif $if_in oif $if_out masquerade comment "from internal interfaces"
-            }
+        counter cnt_dns {
+            comment "count dns packets"
         }
 
-        table inet vpn {
-            chain forward {
-                type filter hook forward priority 0; policy drop;
-                ct state vmap { invalid : drop, established : accept, related : accept }
-
-                ip saddr { $ripbox, $ripmc, $ripmob } oif $if_out accept comment "only specified source ip to internet"
-                iif $if_out oif $if_in ct state related,established accept comment "allow responses from internet"
-
-                iif $if_in oif $if_in jump wg-forward comment "allow internal routing"
-            }
-
-            chain wg-forward {
-                ip saddr $ripbox ip daddr $frostnet accept
-                ip saddr $ripmc ip daddr $frostnet accept
-                ip saddr $ripwin ip daddr { $ripmc } accept
-            }
+        counter cnt_dns_tcp {
+            comment "count dns over tcp packets"
         }
 
-        table netdev filter {
-            chain ingress {
-                type filter hook ingress devices = {$if_in, $if_out} priority -500
-                jump ingress_filter
-            }
+        limit lim_ssh { rate over 10/minute }
+        limit lim_icmp { rate 10/second ; comment "no ping floods"}
+        limit lim_dns { rate 150/second ; comment "no dns floods" }
 
-            # Basic filter chain, devices can be configued to jump here
-            chain ingress_filter {
-                ip frag-off & 0x1fff != 0 counter drop comment "drop all fragments"
-                tcp flags fin,psh,urg / fin,psh,urg counter packets 0 bytes 0 drop comment "drop xmas nmap packets"
-                tcp flags & (fin|syn|rst|psh|ack|urg) == fin|syn|rst|psh|ack|urg counter drop comment "drop xmas packets"
-                tcp flags & (fin|syn|rst|psh|ack|urg) == 0x0 counter drop comment "drop null packets"
-                tcp flags syn tcp option maxseg size 1-535 counter drop comment "drop uncommon mss values"
-                tcp flags & (fin|syn) == (fin|syn) counter drop comment "drop fin and syn at the same time"
-                tcp flags & (syn|rst) == (syn|rst) counter drop comment "drop rst and syn at the same time"
-            }
+        set deny_v4 { type ipv4_addr ; flags dynamic, timeout ; timeout 5m ; comment "deny list of blocked ip addresses";}
+
+        chain rpfilter {
+            type filter hook prerouting priority mangle + 10; policy drop;
+            fib saddr . mark . iif oif exists accept comment "reverse path check"
         }
-      '';
-      };
+
+        chain input {
+            type filter hook input priority 0; policy drop;
+            # iif is save here, because lo is a stable interface and trusted
+            iif lo accept comment "trusted interfaces"
+            ip saddr @deny_v4 drop comment "drop all clients from blocking list"
+            icmp type echo-request limit name lim_icmp counter accept comment "No ping floods and allow pings"
+            ct state vmap { invalid : drop, established : accept, related : accept, new : jump services, untracked : jump services }
+        }
+
+        chain output {
+            type filter hook output priority 0; policy drop;
+            ct state vmap { invalid : drop, established : accept, related : accept, new : accept, untracked : accept } comment "allow outgoing packages"
+        }
+
+        chain services {
+            # iif is save here because eth0 is a physical interface created at boot
+            iif $if_wg udp dport $wg_port accept comment "open wg port"
+
+            # iifname is needed becaue wg0 is a dynamic interface
+            iifname $ssh tcp dport 22 ct state new, untracked limit name lim_ssh update @deny_v4 { ip saddr } comment "limit ssh connection in time to blocking list"
+            iifname $ssh tcp dport 22 meter ssh_meter { ip saddr ct count over 5 } counter drop comment "limit ssh max connections per ip"
+            iifname $ssh tcp dport 22 ct state new counter name cnt_ssh log prefix "[nftables] new ssh connection: " accept comment "allow, log, count new ssh connections"
+
+            iifname $dns udp dport 53 limit name lim_dns counter name cnt_dns accept comment "limit dns queries on interface"
+            iifname $dns tcp dport 53 limit name lim_dns counter name cnt_dns_tcp accept comment "limit dns queries on interface"
+        }
+    }
+
+    table inet nat {
+        chain postrouting {
+            # dont do a policy drop; here, internal redirects to loopback will fail
+            type nat hook postrouting priority 100; policy accept;
+            # mix iifname for wg0 and oif for eth0
+            iifname $if_in oif $if_out masquerade comment "from internal interfaces"
+        }
+    }
+
+    table inet vpn {
+        chain forward {
+            type filter hook forward priority 0; policy drop;
+            ct state vmap { invalid : drop, established : accept, related : accept }
+
+            ip saddr $vpn_allow oif $if_out accept comment "only specified source ip to internet"
+            iif $if_out oifname $if_in ct state related,established accept comment "allow responses from internet"
+
+            iifname $if_in oifname $if_in jump wg-forward comment "allow internal routing"
+        }
+
+        chain wg-forward {
+            ip saddr $client1 ip daddr $wg_internal accept
+            ip saddr $client2 ip daddr $wg_internal accept
+            ip saddr $client3 ip daddr { $client2 } accept
+        }
+    }
+
+    table netdev filter {
+        chain ingress {
+            # can be a problem here to add wg0. do this in a extra systemd oneshot ruleset for dynamic interfaces
+            type filter hook ingress devices = { $if_out } priority -500
+            jump ingress_filter
+        }
+
+        # Basic filter chain, devices can be configued to jump here
+        chain ingress_filter {
+            ip frag-off & 0x1fff != 0 counter drop comment "drop all fragments"
+            tcp flags fin,psh,urg / fin,psh,urg counter packets 0 bytes 0 drop comment "drop xmas nmap packets"
+            tcp flags & (fin|syn|rst|psh|ack|urg) == fin|syn|rst|psh|ack|urg counter drop comment "drop xmas packets"
+            tcp flags & (fin|syn|rst|psh|ack|urg) == 0x0 counter drop comment "drop null packets"
+            tcp flags syn tcp option maxseg size 1-535 counter drop comment "drop uncommon mss values"
+            tcp flags & (fin|syn) == (fin|syn) counter drop comment "drop fin and syn at the same time"
+            tcp flags & (syn|rst) == (syn|rst) counter drop comment "drop rst and syn at the same time"
+        }
+    }
+'';
+};
 
 ```
 
-## testing (todo)
+## testing ruleset
 
-how to check if the nft statements works correct?
+here are some tests to see if the ruleset work.
+these are not complete or described in detail.
+they are for practice purposes only and do not replace further tests.
 
 ```sh
 ping -t 192.168.1.1 -l 65500 # ping flood
@@ -602,11 +650,11 @@ dog -U -n 192.168.1.1 google.de # test udp dns query
 dog -T -n 192.168.1.1 google.de # test tcp dns query
 
 ssh 192.168.1.1 # ssh counter and log entry
-
-nft list counters
 ```
 
 ```sh
+nft list counters
+
 table inet fw {
     counter cnt_ssh {
         comment "count ssh packets"
@@ -634,22 +682,21 @@ nmap -sN 192.168.1.1 -p22 # counter increase by two null packets
 nmap -sF 192.168.1.1 -p22 # not in counter
 nmap -sX 192.168.1.1 -p22 # counter increase by two xmas
 nmap -sS --scanflags SYNFIN 192.168.1.1 -p22 # URG, ACK, PSH, RST, SYN, and FIN
-# no example found to send uncommon mss values
-
 ```
+
+## docs
+
+- [basic nftables introduction](https://ripx80.de/posts/04-nftables/)
+- [difference](https://serverfault.com/questions/985158/what-is-the-difference-between-iifname-and-iif-in-nftables) between iif and iifname
+- [flowtables on nixos](https://discourse.nixos.org/t/nftables-could-not-process-rule-no-such-file-or-directory/33031)
+- [flowtable explaination](https://thermalcircle.de/doku.php?id=blog:linux:flowtables_1_a_netfilter_nftables_fastpath) article
+- [nftables scripting](https://wiki.nftables.org/wiki-nftables/index.php/Scripting)
 
 ## learned
 
-- postrouting:
-- prerouting:
 - masquerade: Masquerade is a special case of SNAT, where the source address is automagically set to the address of the output interface.
 - redirect: By using redirect, packets will be forwarded to local machine. Is a special case of DNAT where the destination is the current machine.
 - ${pkgs.iproute}/bin/ip link set mtu 1380 dev wg0 # set the mtu of wg0 interface to 1380
 - journalctl -f read on the fly, journalctl -k only kernel messages like nftables, journal -k --priority=4 (show priority level 4 like nftables)
 - tcpdump -i eth0 host 38.10.10.1 and not port 58432
 - if you have a table this rules will added or change the ruleset like the default policy of a chain.
-- nft syntax for the logging statement
-
-```sh
-nft add rule inet fw services iifname wg0 tcp dport 22 ct state new log prefix \"[nftables] new ssh accepted: \" accept comment "allow and log ssh"
-```

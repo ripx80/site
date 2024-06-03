@@ -31,13 +31,27 @@
 
 ## posts
 
+- multipath routing
+- gluetun article
+- traffic control and ratelimit
+- wg mtu
+- article: linux sockets
+- stun protocol (signal)
+- nixos on omnia 6
+- geoip db how it works, can i implement myself?
+- tun/tap/dummy interfaces
+- mirror port over tun/tap or socket
 - minimal tech startup you need only 10$
-- nix write derivations
-- (I) - post template
 - how i set up nix secrets
 - write down acutal dev practices: seperate page on website with the very important ones
 - high documentation, low meeting culture
 - rust errors post
 - nixos with unbound article
-- nixos routing article
-- nixos gluetun article
+
+```txt
+unshare -r -n
+ip link add name dummy0 type dummy
+```
+
+- interface groups: ip link set dev interface group 99
+- iifgroup
