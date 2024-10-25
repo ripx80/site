@@ -3,6 +3,33 @@
 - you need cuda support
 - if you have no cuda support you get compile errors and no working server
 
+## nvidia on nixos
+
+```sh
+#hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable; #550.78-6.10.6
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.beta; # 550.78-6.10.6
+  #hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest; # 550.78-6.10.6
+  #hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.production; #550.78-6.10.6
+  #   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
+  #         version = "555.58.02";
+  #         sha256_64bit = "sha256-xctt4TPRlOJ6r5S54h5W6PT6/3Zy2R4ASNFPu8TSHKM=";
+  #         sha256_aarch64 = "sha256-8hyRiGB+m2hL3c9MDA/Pon+Xl6E788MZ50WrrAGUVuY=";
+  #         openSha256 = "sha256-8hyRiGB+m2hL3c9MDA/Pon+Xl6E788MZ50WrrAGUVuY=";
+  #         settingsSha256 = "sha256-ZpuVZybW6CFN/gz9rx+UJvQ715FZnAOYfHn5jt5Z2C8=";
+  #         persistencedSha256 = "sha256-xctt4TPRlOJ6r5S54h5W6PT6/3Zy2R4ASNFPu8TSHKM=";
+  #     };
+  #boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  #   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
+  #   version = "560.35.03";
+  #   sha256_64bit = "sha256-8pMskvrdQ8WyNBvkU/xPc/CtcYXCa7ekP73oGuKfH+M=";
+  #   sha256_aarch64 = "";
+  #   openSha256 = "";
+  #   settingsSha256 = "sha256-kQsvDgnxis9ANFmwIwB7HX5MkIAcpEEAHc8IBOLdXvk=";
+  #   persistencedSha256 = "";
+  # };
+```
+
 ## cuda on nix
 
 ```sh
