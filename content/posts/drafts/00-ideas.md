@@ -88,3 +88,11 @@
     sslscan/2  nix-shell -p sslscan
     tslx
 ```
+
+## coreboot
+
+same hardware: guide: https://protectli.com/wp-content/uploads/2020/11/coreboot-building-guide.pdf
+https://flashrom.org/Board_Testing_HOWTO
+https://forum.opnsense.org/index.php?topic=20315.0
+https://doc.coreboot.org/flash_tutorial/index.html
+https://www.linux-magazin.de/ausgaben/2018/07/coreboot/
