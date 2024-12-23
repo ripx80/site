@@ -16,8 +16,8 @@ only for self tracking and keep motivated to read more.
 
 01. hegels world (hegels welt) - juergen kaube
 02. think in systems - donella h. meadows
-03. auris - vincent kliesch
-04. win (nichts bleibt begraben) - harlan coben
+03. before they are hanged (feuerklingen) - joe abercrombie
+04. the daily stoic (der taegliche stoiker) - ryan holiday
 
 ## < pipe
 
@@ -29,18 +29,22 @@ only for self tracking and keep motivated to read more.
 06. moonwalking with einstein - joshua foer
 07. how to take smart notes - söhnke ahrens
 08. the dragonbone chair - tad williams
-09. the first law - joe abercrombie
-10. best served cold (racheklingen) - joe abercrombie
-11. blood song (das lied des blutes) - anthony ryan
-12. paradise  (das verlorene paradies) - abdulrazak gurnah
-13. great expectations (große erwartungen) - charles dickens
-14. more from tad williams
+09. best served cold (racheklingen) - joe abercrombie
+10. blood song (das lied des blutes) - anthony ryan
+11. paradise  (das verlorene paradies) - abdulrazak gurnah
+12. great expectations (große erwartungen) - charles dickens
+13. more from tad williams
+14. the last argument of kings (koenigsklingen) - joe abercrombie
 
 ## 2024
 
-goal: 1/10
+goal: 5/10
 
 01. piranesi - susanna clarke
+02. win (nichts bleibt begraben) - harlan coben
+03. the blade itself (kriegsklingen) - joe abercrombie
+04. all the light we cannot see (alles licht was wir nicht sehen) - anthony doerr
+05. where the crawdads sing (der gesang der flusskrebse) - delia owens
 
 ## 2023
 
@@ -57,6 +61,7 @@ goal: 07/10
 ### leave
 
 01. bloody rose - nicholas eames
+02. auris - vincent kliesch
 
 ## 2022
 
@@ -64,7 +69,7 @@ goal: 05/10
 
 01. $100 startup - chris guillebeau
 02. the name of the wind - patrick rothfuss
-03. the knight of the seven kingdoms
+03. the hedge knight - george r.r. martin
 04. the diet compass - bas kast
 05. wise man’s fear - patrick rothfuss
 

@@ -1,3 +1,19 @@
+---
+author: "ripx80"
+title: "Turris Omnia"
+linktitle: "Turris Omnia"
+description: ""
+date: 2024-11-20
+draft: true
+tags:
+  - network
+  - security
+keywords:
+  - network
+  - security
+weight: 0
+---
+
 # metavoice
 
 - you need cuda support

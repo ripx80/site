@@ -1,3 +1,19 @@
+---
+author: "ripx80"
+title: "Turris Omnia"
+linktitle: "Turris Omnia"
+description: ""
+date: 2024-11-20
+draft: true
+tags:
+  - network
+  - security
+keywords:
+  - network
+  - security
+weight: 0
+---
+
 # ideas
 
 ```sh
@@ -11,7 +27,7 @@
 # wireguard debbuging
 
 # modprobe wireguard
-# echo module wireguard +p > /sys/kernel/debug/dynamic_debug/contro
+# echo module wireguard +p > /sys/kernel/debug/dynamic_debug/control
 # dmesg -wT | grep wireguard
 
 # ip route get 192.168.110.1
@@ -96,3 +112,28 @@ https://flashrom.org/Board_Testing_HOWTO
 https://forum.opnsense.org/index.php?topic=20315.0
 https://doc.coreboot.org/flash_tutorial/index.html
 https://www.linux-magazin.de/ausgaben/2018/07/coreboot/
+
+## efi shell
+
+```txt
+https://mricher.fr/post/boot-from-an-efi-shell/
+# temp solution to boot the system
+FS0:
+ls
+cd EFI
+cd NixOS-boot
+grub64.efi
+
+# get a list of commands
+FS0:
+cat help.txt
+
+# add entry to uefi table
+FS0:
+# list entrys and take the last number to add
+bcfg boot dump -b
+bcfg boot add 6 FS0:\EFI\GRUB\grubx64.efi "GRUB"
+# mv to the first place
+bcfg boot mv 6 0
+# reboot
+```
