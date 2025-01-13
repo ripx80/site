@@ -16,8 +16,7 @@ only for self tracking and keep motivated to read more.
 
 01. hegels world (hegels welt) - juergen kaube
 02. think in systems - donella h. meadows
-03. before they are hanged (feuerklingen) - joe abercrombie
-04. the daily stoic (der taegliche stoiker) - ryan holiday
+03. the daily stoic (der taegliche stoiker) - ryan holiday
 
 ## < pipe
 
@@ -35,6 +34,10 @@ only for self tracking and keep motivated to read more.
 12. great expectations (große erwartungen) - charles dickens
 13. more from tad williams
 14. the last argument of kings (koenigsklingen) - joe abercrombie
+
+## 2025
+
+01. before they are hanged (feuerklingen) - joe abercrombie
 
 ## 2024
 

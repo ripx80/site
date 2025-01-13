@@ -56,3 +56,9 @@ ip link add name dummy0 type dummy
 - interface groups: ip link set dev interface group 99
 - iifgroup
 - things you can do with iperf3
+
+## dev
+
+```sh
+git submodule update --init --recursive
+```
