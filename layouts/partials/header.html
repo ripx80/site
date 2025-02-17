@@ -1,0 +1,10 @@
+<a class="mainlink" href="/">
+    <div class="logo"></div>
+    <h1>{{ site.Title }}</h1>
+</a>
+{{ partial "menu.html" (dict "menuID" "main" "page" .) }}
+<section id="about">
+    {{ if isset .Site.Params "description" }}
+    {{ .Site.Params.description | $.Page.RenderString }}
+    {{ end }}
+</section>

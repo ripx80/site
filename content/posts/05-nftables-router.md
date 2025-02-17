@@ -18,10 +18,10 @@ keywords:
 weight: 0
 ---
 
-## short
-
 this post deals with some advanced rules and configurations to build router based on the previous post about [nftables - basics](https://ripx80.de/posts/04-nftables/).
 the focus is in general on nftables but the whole thing is build on a nixos system.
+
+<!--more-->
 
 if you need additional ideas or use cases? take a look at the blog (comming soon) post.
 
@@ -45,7 +45,9 @@ nft flush ruleset # clear, flush the entire ruleset
 nft list counters # list named counters
 
 # nft syntax for the logging statement
-nft add rule inet fw services iifname wg0 tcp dport 22 ct state new log prefix \"[nftables] new ssh accepted: \" accept comment "allow and log ssh"
+nft add rule inet fw services iifname wg0 \
+tcp dport 22 ct state new log prefix \
+\"[nftables] new ssh accepted: \" accept comment "allow and log ssh"
 ```
 
 ## network struct
@@ -80,10 +82,11 @@ a good example when **iif** should be used is the loopback (lo) interface.
 the index of this interface is garanteed, its always the first interface with normaly the index number **1**. It can not be deleted or added a second time.
 this can be verified with
 
-```sh
+```txt
 ip address show lo
 
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state \
+UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
        valid_lft forever preferred_lft forever
@@ -141,18 +144,23 @@ the default struct of my tables look like this.
 table inet fw {
   chain rpfilter {
     type filter hook prerouting priority mangle + 10; policy drop
-    fib saddr . mark . iif oif exists accept comment "reverse path check"
+    fib saddr . mark . iif oif exists accept comment \
+    "reverse path check"
   }
   chain input {
      type filter hook input priority 0; policy drop
      iif lo accept comment "trusted interfaces"
-     ct state vmap { invalid : drop, established : accept, related : accept, new : jump services, untracked : jump services }
+     ct state vmap { invalid : drop, established : accept, \
+     related : accept, new : jump services, untracked : jump services }
   }
 
   chain output {
     type filter hook output priority 0; policy drop;
-    ct state vmap { invalid : drop, established : accept, related : accept, new : accept, untracked : accept } comment "allow outgoing packages"
+    ct state vmap { invalid : drop, established : accept, \
+    related : accept, new : accept, untracked : accept } \
+    comment "allow outgoing packages"
   }
+
   chain services {
   }
 }
@@ -180,10 +188,12 @@ also we want to count the number of requests and use the **counter** statement t
 ```sh
 table inet fw {
 
-    limit lim_icmp { rate 10/second ; comment "no ping floods, allow 10 requests per second"}
+    limit lim_icmp { rate 10/second ; \
+    comment "no ping floods, allow 10 requests per second"}
 
     chain input {
-        icmp type echo-request limit name lim_icmp counter accept comment "no ping floods and allow pings"
+        icmp type echo-request limit name lim_icmp counter accept \
+        comment "no ping floods and allow pings"
     }
 }
 ```
@@ -197,7 +207,8 @@ in addition a internal dns service is run for the internal network and use a lim
 ```sh
 table inet fw {
 
-  limit lim_dns { rate 150/second ; comment "no dns floods, allow 150 queries per second" }
+  limit lim_dns { rate 150/second; \
+  comment "no dns floods, allow 150 queries per second" }
 
   counter cnt_dns {
     comment "count dns over udp packets"
@@ -207,9 +218,14 @@ table inet fw {
   }
 
   chain services {
-    iif "eth0" udp dport 3000 accept comment "open wg port to the internet"
-    iifname "wg0" udp dport 53 limit name lim_dns counter name cnt_dns accept comment "limit dns queries on interface"
-    iifname "wg0" tcp dport 53 limit name lim_dns counter name cnt_dns_tcp accept comment "limit dns queries on interface"
+    iif "eth0" udp dport 3000 accept \
+    comment "open wg port to the internet"
+    iifname "wg0" udp dport 53 limit name lim_dns \
+    counter name cnt_dns accept \
+    comment "limit dns queries on interface"
+    iifname "wg0" tcp dport 53 limit name lim_dns \
+    counter name cnt_dns_tcp accept \
+    comment "limit dns queries on interface"
   }
 }
 ```
@@ -230,16 +246,24 @@ table inet fw {
 
   limit lim_ssh { rate over 10/minute }
 
-  set deny_v4 { type ipv4_addr ; flags dynamic, timeout ; timeout 5m ; comment "deny list of blocked ip addresses";}
+  set deny_v4 { type ipv4_addr ; flags dynamic, timeout ; timeout 5m ;\
+  comment "deny list of blocked ip addresses";}
 
   chain input {
-    ip saddr @deny_v4 drop comment "drop all clients from blocking list"
-    ct state vmap { invalid : drop, established : accept, related : accept, new : jump services, untracked : jump services }
+    ip saddr @deny_v4 drop \
+    comment "drop all clients from blocking list"
+    ct state vmap { invalid : drop, established : accept, \
+    related : accept, new : jump services, untracked : jump services }
   }
 
   chain services {
-    iifname "wg0" tcp dport 22 ct state new, untracked limit name lim_ssh update @deny_v4 { ip saddr } comment "limit ssh connection in time to blocking list"
-    iifname "wg0" tcp dport 22 ct state new counter name cnt_ssh log prefix "[nftables] new ssh connection: " accept comment "allow, log, count new ssh connections"
+    iifname "wg0" tcp dport 22 ct state new, untracked \
+    limit name lim_ssh update @deny_v4 { ip saddr } \
+    comment "limit ssh connection in time to blocking list"
+    iifname "wg0" tcp dport 22 ct state new \
+    counter name cnt_ssh log prefix \
+    "[nftables] new ssh connection: " accept \
+    comment "allow, log, count new ssh connections"
   }
 }
 
@@ -313,9 +337,12 @@ table ip nat {
     type nat hook postrouting priority srcnat; policy accept;
     # input interface is the internal wireguard network 'wg0'.
     # output interface is the outgoing interface 'eth0'.
-    # the source nat will be masquerade, only the ip address of your router will shown to the outside
-    # all packets from wg0 will be translated/rewritten to the ip of the router
-    iifname "wg0" oif "eth0" masquerade comment "from internal interfaces"
+    # the source nat will be masquerade,
+    # only the ip address of your router will shown to the outside
+    # all packets from wg0 will be translated/rewritten
+    # to the ip of the router
+    iifname "wg0" oif "eth0" masquerade \
+    comment "from internal interfaces"
   }
 }
 ```
@@ -335,9 +362,12 @@ table ip filter {
   chain forward {
     type filter hook forward priority 0; policy drop;
     # only new connections from wg0 to eth0 are accepted and forwarded
-    iifname "wg0" oif "eth0" accept comment "only from wg0 to internet"
-    # you need the reverse path for your packages, so only allow related and ethablished packts from the internet
-    iif "eth0" oifname "wg0" ct state related,established accept comment "allow responses from internet"
+    iifname "wg0" oif "eth0" accept \
+    comment "only from wg0 to internet"
+    # you need the reverse path for your packages,
+    # so only allow related and ethablished packts from the internet
+    iif "eth0" oifname "wg0" ct state related,established accept \
+    comment "allow responses from internet"
   }
 }
 ```
@@ -357,8 +387,10 @@ wireguard = {
         peers = [{
           # vpn only mode, all traffic ipv4 and ipv6
           allowedIPs = [ "0.0.0.0/0" "::/0" ];
-          publicKey = UIUczSljVOqle8FnOO+mp9Dmdc49ojv7559T+KdTnnE=; # example key here
-          endpoint = "80.1.1.1:3000"; # example public ip of the router
+          # example key here
+          publicKey = UIUczSljVOqle8FnOO+mp9Dmdc49ojv7559T+KdTnnE=;
+          # example public ip of the router
+          endpoint = "80.1.1.1:3000";
         }];
     mtu = 1380;
     };
@@ -380,9 +412,12 @@ for this setting the previous rule must be replaced if a list of allowed ip's in
     chain forward {
         type filter hook forward priority 0; policy drop;
         # disable "all" forwarding rule
-        # iifname "wg0" oif "eth0" accept comment "only from wg0 to internet"
+        # iifname "wg0" oif "eth0" accept \
+        # comment "only from wg0 to internet"
         # add source address to forward
-        ip saddr { 192.168.1.2, 192.168.1.3, 192.168.1.4 } oif "eth0" accept comment "only specified source ip to internet"
+        ip saddr { 192.168.1.2, 192.168.1.3, 192.168.1.4 } \
+        oif "eth0" accept \
+        comment "only specified source ip to internet"
     }
  }
 ```
@@ -400,8 +435,10 @@ table ip filter {
     chain forward {
       type filter hook forward priority 0; policy drop;
       # here the state will be set in a vmap as default
-      ct state vmap { invalid : drop, established : accept, related : accept }
-      iifname "wg0" oifname "wg0" accept comment "allow client communication inside wg0"
+      ct state vmap { invalid : drop, established : accept, \
+      related : accept }
+      iifname "wg0" oifname "wg0" accept \
+      comment "allow client communication inside wg0"
     }
 }
 ```
@@ -414,13 +451,16 @@ but maybe you will restrict clients inside your wireguard network to talk to eac
 table ip filter {
     chain forward {
       type filter hook forward priority 0; policy drop;
-      ct state vmap { invalid : drop, established : accept, related : accept }
+      ct state vmap { invalid : drop, established : accept, \
+      related : accept }
       iifname "wg0" oifname "wg0" jump wg-forward
     }
 
     chain wg-forward {
-        ip saddr 192.168.1.2 ip daddr { 192.168.1.3, 192.168.1.4 } accept
-        ip saddr 192.168.1.3 ip daddr { 192.168.1.2 } accept
+        ip saddr 192.168.1.2 \
+        ip daddr { 192.168.1.3, 192.168.1.4 } accept
+        ip saddr 192.168.1.3 \
+        ip daddr { 192.168.1.2 } accept
     }
 }
 ```
@@ -480,7 +520,8 @@ in this example the flow will go from **wg0** to **eth0** direct from **ingress*
         type filter hook forward priority 0; policy drop;
 
         # enable flow offloading for better throughput
-        ip protocol { tcp, udp } ct state established flow offload @ft counter
+        ip protocol { tcp, udp } ct state established \
+        flow offload @ft counter
     }
 }
 ```
@@ -681,7 +722,8 @@ journalctl -k --priority=4 | tail
 nmap -sN 192.168.1.1 -p22 # counter increase by two null packets
 nmap -sF 192.168.1.1 -p22 # not in counter
 nmap -sX 192.168.1.1 -p22 # counter increase by two xmas
-nmap -sS --scanflags SYNFIN 192.168.1.1 -p22 # URG, ACK, PSH, RST, SYN, and FIN
+# URG, ACK, PSH, RST, SYN, and FIN
+nmap -sS --scanflags SYNFIN 192.168.1.1 -p22
 ```
 
 ## docs

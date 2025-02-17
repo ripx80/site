@@ -12,15 +12,13 @@ tags:
 weight: 0
 ---
 
-## introduction
-
-long things **short**:
-
 - we are influenced by our environment
 - the more often we have the same thing every day, the more likely they are to become a requirement
 - track yourself what's your hidden requirements, to be aware of
 - stay minimal in life and technical
 - enjoy if you have more at the time, it will not always be like this
+
+<!--more-->
 
 ## story #2
 

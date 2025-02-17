@@ -1,0 +1,26 @@
+{{ define "main" }}
+<section class="blog">
+    <h2>blog</a></h2>
+    {{ $dataFormat := .Site.Params.dateFormat | default "2006-01-02" }}
+    {{ $mainPosts := (sort ( where site.RegularPages "Type" "in" site.Params.mainSections ) "Date" "desc") }}
+    <ul>
+        {{ range $mainPosts }}
+        <li>
+            <a href="{{ .Permalink }}">
+                <time datetime="{{ time .Date }}" itemprop="datePublished">{{ .Date.Format $dataFormat }}</time>
+                {{ if .Title }} {{- .Title -}} {{ else }} {{- print "Untitled" -}}{{ end
+                }}
+            </a>
+        </li>
+        {{ end }}
+    </ul>
+</section>
+<section class="projects">
+    <h2>projects</h2>
+    <ul class="project-list">
+        {{range .Site.Params.projects }}
+        <li><a href="{{.url}}">{{.name}}</a><span class="description">{{.desc}}</span></li>
+        {{end}}
+    </ul>
+</section>
+{{ end }}

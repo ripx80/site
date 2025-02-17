@@ -10,6 +10,9 @@ tags:
 weight: 0
 ---
 
+brewing recipe for a czech original ufleku beer.
+
+<!--more-->
 ## story
 
 the desire

@@ -19,12 +19,12 @@ keywords:
 weight: 0
 ---
 
-## short
-
 when the wireguard protocol is used the mtu size is reduced inside the tunnel.
 this can be a problem when your isp cut off your mtu size and you use large packets like the ssh handshake inside a wireguard connection.
 this results in a connection that sometimes work and sometimes not.
 to enable a stable connection within wireguard and to avoid isp-related problems, the **mtu** should be set to **1380** bytes.
+
+<!--more-->
 
 ## wg overhead
 
@@ -65,10 +65,10 @@ this is only a snipped of the complete ssh configuration.
 # server
 services.openssh = {
     settings = {
-    KexAlgorithms = [
-        "curve25519-sha256@libssh.org"
-        "diffie-hellman-group-exchange-sha256"
-    ];
+        KexAlgorithms = [
+            "curve25519-sha256@libssh.org"
+            "diffie-hellman-group-exchange-sha256"
+        ];
     };
 
     extraConfig = ''
@@ -78,7 +78,11 @@ services.openssh = {
 # client
 programs.ssh = {
     # mozilla recomended
-    # ssh-ed25519-cert-v01@openssh.com,ssh-rsa-cert-v01@openssh.com,ssh-ed25519,ssh-rsa,ecdsa-sha2-nistp521-cert-v01@openssh.com,ecdsa-sha2-nistp384-cert-v01@openssh.com,ecdsa-sha2-nistp256-cert-v01@openssh.com,ecdsa-sha2-nistp521,ecdsa-sha2-nistp384,ecdsa-sha2-nistp256
+    # ssh-ed25519-cert-v01@openssh.com,ssh-rsa-cert-v01@openssh.com,
+    # ssh-ed25519,ssh-rsa,ecdsa-sha2-nistp521-cert-v01@openssh.com,
+    # ecdsa-sha2-nistp384-cert-v01@openssh.com,
+    # ecdsa-sha2-nistp256-cert-v01@openssh.com,ecdsa-sha2-nistp521,
+    # ecdsa-sha2-nistp384,ecdsa-sha2-nistp256
     hostKeyAlgorithms = [ "ssh-ed25519" "ssh-rsa" ];
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
     knownHosts = cfg.knownHosts;
@@ -91,28 +95,28 @@ first i check my routing path to my server from my interface connected to the in
 ```sh
 tracepath <public server ip>
 
-1?: [LOCALHOST]                      pmtu 1500
-1:  _gateway                                              1.351ms
-1:  _gateway                                              0.914ms
-2:  _gateway                                              1.514ms pmtu 1460 # magic happens here
+1?: [LOCALHOST] pmtu 1500
+1:  _gateway    1.351ms
+1:  _gateway    0.914ms
+2:  _gateway    1.514ms pmtu 1460 # magic happens here
 2:  no reply
-3:  <gw ip>                                              15.359ms asymm  5
-4:  <gw ip>                                              12.878ms
-5:  <gw ip>                                              15.886ms
+3:  <gw ip>     15.359ms asymm  5
+4:  <gw ip>     12.878ms
+5:  <gw ip>     15.886ms
 ```
 
 and from my server to my public ip of my homelab, because you must messure the mtu from both sides.
 
 ```sh
 tracepath <public ipv4>
- 1?: [LOCALHOST]                      pmtu 1500
- 1:  <gw server hoster>                                    0.763ms
- 1:  <gw server hoster>                                   10.803ms
- 2:  <gw ip>                                               0.440ms
- 3:  <gw ip>                                               3.917ms
- 4:  <isp gw ip>                                           4.716ms asymm  5
+ 1?: [LOCALHOST] pmtu 1500
+ 1:  <gw server hoster> 0.763ms
+ 1:  <gw server hoster> 10.803ms
+ 2:  <gw ip>            0.440ms
+ 3:  <gw ip>            3.917ms
+ 4:  <isp gw ip>        4.716ms asymm  5
  5:  no reply
- 6:  <isp gw ip>                                           4.105ms pmtu 1460 # magic happens again
+ 6:  <isp gw ip>        4.105ms pmtu 1460 # magic happens again
 ```
 
 the gateway hop number 2 (first) and hop number 6 (second) reduced the pmtu (path mtu discovery) to 1460 bytes!

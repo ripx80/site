@@ -16,11 +16,11 @@ keywords:
 weight: 0
 ---
 
-## short
-
 update: **2024-04-20**
 
 nftables is the modern linux kernel (>= 3.13 nft [support](https://git.netfilter.org/nftables/log/doc?showmsg=1)) packet classification framework to replace iptables.
+
+<!--more-->
 
 iptables is not covered in this essay.
 
@@ -67,27 +67,43 @@ here are some commands to interact with the packet framework.
 
 ```sh
 # show
-nft list tables                     # list current tables
-nft list counters                   # list all named counters
-nft --stateless list table filter   # list table filter, omit stateful information like counters
-nft -s list ruleset                 # list all nft instructions
-nft -a list chains                  # list all chains with handle (need to delete)
-nft -j list ruleset                 # output the complete ruleset in json format, export
-nft list ruleset -a                 # get the handle to delte a rule
-nft monitor                         # see live changes on ruleset
+# list current tables
+nft list tables
+# list all named counters
+nft list counters
+# list table filter, omit stateful information like counters
+nft --stateless list table filter
+# list all nft instructions
+nft -s list ruleset
+# list all chains with handle (need to delete)
+nft -a list chains
+# output the complete ruleset in json format, export
+nft -j list ruleset
+# get the handle to delte a rule
+nft list ruleset -a
+# see live changes on ruleset
+nft monitor
 
 # manipulate
-nft delete rule inet nixos-fw input-allow handle 17     # delete rule in nixos-fw chain input-allow handle 17
-nft add ip chain nat prerouting '{ policy drop; }'      # add chain prerouting with default policy drop
-nft add chain ip nat postrouting '{ policy accept; }'   # add chain nat postrouting with default policy accept
-nft replace rule inet forward handle 5 iif "et0" oif "eth1" counter accept # replace a current rule with a new one
+# delete rule in nixos-fw chain input-allow handle 17
+nft delete rule inet nixos-fw input-allow handle 17
+# add chain prerouting with default policy drop
+nft add ip chain nat prerouting '{ policy drop; }'
+# add chain nat postrouting with default policy accept
+nft add chain ip nat postrouting '{ policy accept; }'
+# replace a current rule with a new one
+nft replace rule inet forward handle 5 iif "et0" oif "eth1" \
+counter accept
 
 # clear
-nft flush table ip filter   # flush only table ip filter
-nft flush ruleset           # flush all rules
+# flush only table ip filter
+nft flush table ip filter
+# flush all rules
+nft flush ruleset
 
 # test
-nft -c -o -f ruleset.test   #  read the nft file (f), optimize ruleset(o) in dry-run mode (c)
+#  read the nft file (f), optimize ruleset(o) in dry-run mode (c)
+nft -c -o -f ruleset.test
 ```
 
 further commands can be found in the official [nftables wiki](https://wiki.nftables.org/wiki-nftables/index.php/quick_reference-nftables_in_10_minutes).
@@ -160,7 +176,8 @@ when you set a priority (default is 0) you can use the number or the defined con
 - NF_IP_PRI_CONNTRACK_HELPER (300)
 
 ```sh
-nft add chain inet mytable mychain '{ type filter hook input priority -10; }'
+nft add chain inet mytable mychain \
+'{ type filter hook input priority -10; }'
 ```
 
 this command creates a chain **'mychain'** in table **'mytable'** with a priority of **'-10'** for the **'input'** hook.
@@ -203,7 +220,8 @@ for example start nft monitor and then add a rule to your ruleset.
 two different shells are needed, one to monitor the event and one to apply the rule.
 
 ```sh
-nft monitor # 1. shell, this will catch the prompt
+# 1. shell, this will catch the prompt
+nft monitor
 # 2. shell
 nft add rule inet fw services iif "eth0" tcp dport 443 accept
 nft -a list chain services
@@ -224,7 +242,8 @@ then we delete the previously created rule again.
 to delete a rule the internal handle of the respective rule is required.
 
 ```sh
-nft -a list chain inet fw services # in my case, get the handle 19
+nft -a list chain inet fw services
+# in my case, get the handle 19
 nft delete rule inet fw services handle 19
 ```
 
@@ -238,8 +257,11 @@ to use it, the packet to be tracked must be marked via the meta information of n
 to do this, we use the rule from above and set the meta information for this specific packet.
 
 ```sh
-nft add rule inet fw services iif "eth0" tcp dport 443 meta nftrace set 1 accept # enable tracing
-nft monitor trace # start and waiting for events
+# enable tracing
+nft add rule inet fw services iif "eth0" \
+tcp dport 443 meta nftrace set 1 accept
+# start and waiting for events
+nft monitor trace
 ```
 
 tracing for https (usaly) was activated using the statement **'meta nftrace set 1'**
@@ -249,7 +271,8 @@ to generate some traffic on port 443 and thus some events, i like to use netcat.
 first we create a listener to connect to it.
 
 ```sh
-nc -l 192.168.1.2 443   # listen only on eth0 port 443 tcp
+# listen only on eth0 port 443 tcp
+nc -l 192.168.1.2 443
 ```
 
 you have to make sure that it does not run via the internal loopback 'lo' interface, as this is usually configured as trusted and always works in conjunction with nftables. In addition, the tracing rule would not work here.
@@ -257,7 +280,8 @@ you have to make sure that it does not run via the internal loopback 'lo' interf
 that's why i connect from another maschine to the 'eth0' interface with the ip '192.168.1.2' via netcat.
 
 ```sh
-nc 192.168.1.2 443      # connect to this port from a external maschine (192.168.100.3)
+# connect to this port from a external maschine (192.168.100.3)
+nc 192.168.1.2 443
 ```
 
 after the successful connection, a event is displayed in **nft monitor trace**
@@ -359,18 +383,25 @@ on a normal system without advanced routing stuff or special security requiremen
 networking = {
   firewall = {
       enable = true;
-      logRefusedconnections = false;        # disable logging of refuded connections
-      logRefusedPackets = false;            # disable logging of refused packages
-      allowPing = true;                     # allow ping for diagnostics
-      interfaces.eth0 = {                   # allow wireguard connections from the internet
+      # disable logging of refuded connections
+      logRefusedconnections = false;
+      # disable logging of refused packages
+      logRefusedPackets = false;
+      # allow ping for diagnostics
+      allowPing = true;
+      # allow wireguard connections from the internet
+      interfaces.eth0 = {
         allowedUdpPorts = [
             meta.${config.networking.hostname}.wg.port
         ];
       };
 
-      interfaces.wg0 = {                    # internal wireguard services
-        allowedTcpPorts = [ 22 53 ];        # allow internal ssh and dns via tcp connections
-        allowedUdpPorts = [ 53 ];           # allow internal dns via upd (default for dns queries)
+      # internal wireguard services
+      interfaces.wg0 = {
+        # allow internal ssh and dns via tcp connections
+        allowedTcpPorts = [ 22 53 ];
+        # allow internal dns via upd (default for dns queries)
+        allowedUdpPorts = [ 53 ];
       };
     };
 };
@@ -387,7 +418,8 @@ log for refuded connections and packets are disabled because i dont need it.
 when you build the configuration via **'nixos-rebuild build --flake .#mysystem'** the path to the evaluated ruleset can be found in the systemd file 'result/etc/systemd/system/nftables.service'. Search for the line beginning with ExecStart to identify the nix store path of nftables-rules.
 
 ```txt
-ExecStart=/nix/store/ngdbcld1pdh1h8zpn1541c35zv25q6r2-nftables-rules # example path on mysystem, on other systems it has a different path
+# example path on mysystem, on other systems it has a different path
+ExecStart=/nix/store/ngdbcld1pdh1h8zpn1541c35zv25q6r2-nftables-rules
 ```
 
 in this exanple the file '/nix/store/ngdbcld1pdh1h8zpn1541c35zv25q6r2-nftables-rules' contains the subsequent rules that will be applied to the system.
@@ -431,5 +463,6 @@ nc -z -v domain.com 1-1000 # port scanning
 nc -l 4444 # listen
 nc -l 4444 > received_file # files through
 nc domain.com 4444 < original_file
-nc 'http/1.1 200 ok\n\n%s' "$(cat index.html)" | netcat -l 8888 # http://server_ip:8888
+# http://server_ip:8888
+nc 'http/1.1 200 ok\n\n%s' "$(cat index.html)" | netcat -l 8888
 ```

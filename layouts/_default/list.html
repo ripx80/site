@@ -1,0 +1,15 @@
+{{ define "main" }}
+
+{{ .Content }}
+
+{{ range (sort .Pages "Date" "desc") }}
+{{ $pageYear := (.Date.Format "2006") }}
+{{ if (ne $pageYear ($.Scratch.Get "year")) }}
+{{ $.Scratch.Set "year" $pageYear }}
+<h1>{{ $pageYear }}</h1>
+{{ end }}
+
+<h2><a href="{{ .RelPermalink }}">{{.Date.Format "2006-01-02"}} - {{ .LinkTitle }}</a></h2>
+{{ .Summary }}
+{{ end }}
+{{ end }}

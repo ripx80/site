@@ -1,64 +1,51 @@
-# devbook
+# dev
 
-## roadmap
+show production:
+hugo --environment production server --disableLiveReload
 
-### [v1.0]
+## map
 
-- [ ] (F) messurement of site visits and where they come from (nftables)
-- [x] (F) register domain
-- [x] (F) workflow on github and github pages
-- [x] (I) logo and favicon change to garry
-- [x] (F) create whispered garry shortcode
-- [x] (F) cookie banner vanilla without jquery and other scripts
+- [ ] add blogroll? -> interesting links
 
 ## [v1.1]
 
-- own theme only with < 80kb size transfered -> [minimal](https://retrolog.io/blog/creating-a-hugo-theme-from-scratch/)
-  - serverside highilghting
-  - increase font size
-  - change layout: wider code space
-  - very simple css
-  - no js, no cookies
-  - use this [font](https://j3s.sh/thought/my-deployment-platform-is-a-shell-script.html)
-
 ### change
 
-- posts: short ones, dates at the end (not so visible), sorting number (id)
+- [x] no js
+- [x] no cookies
+- [x] no data policy
+- [x] no impressum
+- [x] no copyright
+- [x] no images (only garry and favicon)
+- [x] no videos
+- [x] no forms
+- [x] no email (found on github)
+- [x] no pagination
+- [x] no rss, dont like xml
+- [x] no sitenotes, use garry
+- [x] no favicon
+
+- [x] yes garry
+- [x] yes grid (not tested)
+- [x] yes tables (not tested, problem with highlight?)
+- [x] yes scrollbar, identicates how long the article is
+- [x] yes tags
+- [x] yes github profile
+- [x] yes code highlight
+- [x] yes sitemap, i hate xml
+- [x] sort blog posts by year (see current page)
+- [x] yes [last mod](https://gohugo.io/methods/page/gitinfo/): .Lastmod
+- size
+  - garry:      4.1kB
+  - main.css    5.4kB
+  - main        3.6kB
+  - favicon     696B
 
 ### add
 
-- web log: add interesting links per year: title: short description, tags
+- blogroll: add interesting links per year: title: short description, tags
 
-## posts
+### bugs
 
-- multipath routing
-- gluetun article
-- traffic control and ratelimit
-- wg mtu
-- article: linux sockets
-- stun protocol (signal)
-- nixos on omnia 6
-- geoip db how it works, can i implement myself?
-- tun/tap/dummy interfaces
-- mirror port over tun/tap or socket
-- minimal tech startup you need only 10$
-- how i set up nix secrets
-- write down acutal dev practices: seperate page on website with the very important ones
-- high documentation, low meeting culture
-- rust errors post
-- nixos with unbound article
-
-```txt
-unshare -r -n
-ip link add name dummy0 type dummy
-```
-
-- interface groups: ip link set dev interface group 99
-- iifgroup
-- things you can do with iperf3
-
-## dev
-
-```sh
-git submodule update --init --recursive
-```
+- dark mode not working with chorme
+- headings on mobile phone are strange

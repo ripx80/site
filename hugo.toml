@@ -1,0 +1,82 @@
+baseURL = 'https://ripx80.de'
+languageCode = 'en-us'
+title = 'ripx80 onexec'
+disableHugoGeneratorInject = true
+enableGitInfo = true
+
+[frontmatter]
+lastmod = [':git', ':fileModTime']
+
+[params]
+author = "ripx80"
+description = "ripx80's technical thoughts and efforts to remember yesterday"
+projectsUrl = "https://github.com/ripx80/site"
+
+[[params.projects]]
+name = 'brewman'
+desc = 'homebrew programm written in go'
+url = 'https://github.com/ripx80/brewman/'
+
+[[params.projects]]
+name = 'snoop-rs'
+desc = 'snoop packet format lib in rust'
+url = 'https://docs.rs/snoop/latest/snoop/'
+
+[[params.projects]]
+name = 'skipper'
+desc = 'skipper http router from zalando (contributor)'
+url = 'https://github.com/zalando/skipper'
+
+[[params.projects]]
+name = 'gopacket'
+desc = 'go packet manipulation lib (contributor)'
+url = 'https://github.com/google/gopacket'
+
+[[params.social]]
+name = "github"
+link = "https://github.com/ripx80"
+
+[[menu.main]]
+name = 'home'
+pageRef = '/'
+weight = 1
+
+[[menu.main]]
+name = 'blog'
+pageRef = '/posts'
+weight = 2
+
+[[menu.main]]
+name = "lib"
+url = "/lib"
+weight = 3
+
+[[menu.main]]
+name = "tags"
+url = "/tags"
+weight = 4
+
+[[menu.main]]
+name = "whoami"
+url = "/whoami"
+weight = 5
+
+[markup]
+[markup.highlight]
+lineNos = false
+lineNumbersInTable = false
+codeFences = true
+
+[taxonomies]
+tag = 'tags'
+
+# only for xml
+# [services]
+# [services.rss]
+# limit = 42
+
+# [sitemap]
+# disable = true # not disabled, xml meh
+
+[outputs]
+home = ['html'] # 'rss' disabled no xml

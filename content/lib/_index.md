@@ -1,22 +1,22 @@
----
-author: "ripx80"
-title: "2022"
-linktitle: "2022"
-description: "books read in 2022 and before"
-date: 2022-01-26t15:18:13+01:00
-draft: false
-tags:
-  - books
-weight: 0
----
++++
+author = "ripx80"
+title = "lib"
+linktitle = "lib"
+description = "books i have read"
+date = 2022-01-26t15:18:13+01:00
+draft = false
+tags = [ 'books' ]
+weight =  0
++++
 
-only for self tracking and keep motivated to read more.
+only for self-tracking and to stay motivated to read more
 
 ## reading
 
 01. hegels world (hegels welt) - juergen kaube
 02. think in systems - donella h. meadows
 03. the daily stoic (der taegliche stoiker) - ryan holiday
+04. the last argument of kings (koenigsklingen) - joe abercrombie
 
 ## < pipe
 
@@ -33,7 +33,6 @@ only for self tracking and keep motivated to read more.
 11. paradise  (das verlorene paradies) - abdulrazak gurnah
 12. great expectations (große erwartungen) - charles dickens
 13. more from tad williams
-14. the last argument of kings (koenigsklingen) - joe abercrombie
 
 ## 2025
 
@@ -94,4 +93,13 @@ goal: 05/10
 14. the art of conversation - catherine blyth
 15. the dip - seth godin
 
-I have certainly read a few more books but forgotten it again and always looking for the lost time
+i have certainly read a few more books, only to forget them again — always searching for lost time.
+
+## recommendation
+
+- the art of exploitation
+- greyhat hacking
+- the tangled web
+- the 4 hour week
+- essentialism - the disciplined pursuit of less
+- accelerate

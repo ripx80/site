@@ -1,0 +1,19 @@
+{{ define "main" }}
+{{ $dateMachine := .Date | time.Format "2006-01-02T15:04:05-07:00" }}
+{{ $dateHuman := .Date | time.Format "2006-01-02" }}
+{{ $lastmod := .Lastmod | time.Format "2006-01-02" }}
+{{ $lastmodMachine := .Lastmod | time.Format "2006-01-02T15:04:05-07:00" }}
+<h1 class="blogtitle">{{ .Title }}</h1>
+<div class="meta">
+    <time datetime="{{ $dateMachine }}">{{ $dateHuman }}</time>
+    {{ if not (eq $dateHuman $lastmod) }}
+    <time datetime="{{ $lastmodMachine }}">| {{ $lastmod }}</time>
+    {{ end }}
+    <span>| {{.WordCount}}</span>
+</div>
+<h2>short</h2>
+<article>
+    {{ .Content }}
+</article>
+{{ partial "terms.html" (dict "taxonomy" "tags" "page" .) }}
+{{ end }}

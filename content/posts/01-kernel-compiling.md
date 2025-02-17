@@ -15,10 +15,10 @@ keywords:
 weight: 0
 ---
 
-## Introduction
-
 This is a short discurse about self kernel compilation on a arch system. Gentoo users are familiar with this kind of instructions or use the genkernel programm.
 You can find an article on [archlinux](https://wiki.archlinux.org/index.php/Kernels/Traditional_compilation)
+
+<!--more-->
 
 ## Install kernel sources and headers
 
@@ -40,10 +40,12 @@ check the sha256 checksum and decompress the archive and check the sign. you can
 
 ```sh
 grep 'linux-4.13.2.tar.xz' sha256sums.asc
-064adc177a384a7aee6b18ef5d47c1cea3a43fae1aaa6aa95fdc97eb137ffcd1  linux-4.13.2.tar.xz
+064adc177a384a7aee6b18ef5d47c1cea3a43fae1aaa6aa95fdc97eb137ffcd1\
+linux-4.13.2.tar.xz
 
 sha256sum linux-4.13.2.tar.xz
-064adc177a384a7aee6b18ef5d47c1cea3a43fae1aaa6aa95fdc97eb137ffcd1  linux-4.13.2.tar.xz
+064adc177a384a7aee6b18ef5d47c1cea3a43fae1aaa6aa95fdc97eb137ffcd1\
+linux-4.13.2.tar.xz
 
 unxz linux-4.13.2.tar.xz
 gpg2 --verify linux-4.13.2.tar.sign
