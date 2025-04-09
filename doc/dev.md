@@ -49,3 +49,7 @@ hugo --environment production server --disableLiveReload
 
 - dark mode not working with chorme
 - headings on mobile phone are strange
+
+## think
+
+- think site: only txt like blog in raw txt and phrack or like [this](https://chrisdone.com/posts/)
