@@ -49,6 +49,7 @@ hugo --environment production server --disableLiveReload
 
 - dark mode not working with chorme
 - headings on mobile phone are strange
+- garry image on dark mode is white
 
 ## think
 

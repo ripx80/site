@@ -15,8 +15,7 @@ only for self-tracking and to stay motivated to read more
 
 01. hegels world (hegels welt) - juergen kaube
 02. think in systems - donella h. meadows
-03. the last argument of kings (koenigsklingen) - joe abercrombie
-04. rust under the hood - sandeep ahluwalia
+03. rust under the hood - sandeep ahluwalia
 
 ## < pipe
 
@@ -28,16 +27,18 @@ only for self-tracking and to stay motivated to read more
 06. moonwalking with einstein - joshua foer
 07. how to take smart notes - söhnke ahrens
 08. the dragonbone chair - tad williams
-09. best served cold (racheklingen) - joe abercrombie
+09. great expectations (große erwartungen) - charles dickens
 10. blood song (das lied des blutes) - anthony ryan
 11. paradise  (das verlorene paradies) - abdulrazak gurnah
-12. great expectations (große erwartungen) - charles dickens
-13. more from tad williams
+12. more from tad williams
 
 ## 2025
 
 01. before they are hanged (feuerklingen) - joe abercrombie
 02. the daily stoic (der taegliche stoiker) - ryan holiday
+03. the last argument of kings (koenigsklingen) - joe abercrombie
+04. best served cold (racheklingen) - joe abercrombie
+05. blood song (das lied des blutes) - anthony ryan
 
 ## 2024
 
