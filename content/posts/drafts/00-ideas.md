@@ -132,7 +132,7 @@ cat help.txt
 FS0:
 # list entrys and take the last number to add
 bcfg boot dump -b
-bcfg boot add 6 FS0:\EFI\GRUB\grubx64.efi "GRUB"
+bcfg boot add 6 FS0:\EFI\NixOS-boot\grubx64.efi "GRUB"
 # mv to the first place
 bcfg boot mv 6 0
 # reboot
