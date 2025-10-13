@@ -39,6 +39,7 @@ only for self-tracking and to stay motivated to read more
 03. the last argument of kings (koenigsklingen) - joe abercrombie
 04. best served cold (racheklingen) - joe abercrombie
 05. blood song (das lied des blutes) - anthony ryan
+06. peter pan - james matthew barrie
 
 ## 2024
 
