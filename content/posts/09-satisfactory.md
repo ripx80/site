@@ -116,3 +116,30 @@ local 192.168.178.1 from 192.168.178.1 dev lo uid 1000
 
     nixos-container root-login satisfactory
 ```
+
+## satisfactory router to satisfactory dnat
+
+```txt
+table inet nat {
+    chain prerouting {
+        type nat hook prerouting priority -100; policy accept;
+        iifname wg0 tcp dport $satisfactory_ports counter dnat ip to <ip> comment "satisfactory ports"
+        iifname wg0 udp dport $satisfactory_ports counter dnat ip to <ip> comment "satisfactory ports"
+        iifname wg0 tcp dport 8080 counter dnat ip to <ip> comment "todo: test"
+    }
+    chain postrouting {
+        type nat hook postrouting priority srcnat; policy accept;
+        ip daddr <ip> counter masquerade comment "port forwarding satisfactory"
+    }
+}
+table inet routing {
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+        ct state vmap { invalid : drop, established : accept, related : accept }
+
+            # port forwarding satisfactory
+        iifname wg0 oifname wg1 tcp dport $satisfactory_ports counter accept comment "port forward internet to internal"
+        iifname wg0 oifname wg1 udp dport $satisfactory_ports counter accept comment "port forward internet to internal"
+    }
+}
+```
